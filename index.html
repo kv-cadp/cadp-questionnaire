@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quel alternant pour votre entreprise ? — CADP</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #141E3C;
+            --navy-light: #1E2D52;
+            --navy-dark: #0D1529;
+            --gold: #C9A84C;
+            --gold-light: #E0C97A;
+            --gold-bg: #F8F3E6;
+            --green: #1B6B3A;
+            --green-light: #E8F5E9;
+            --red: #A63D2F;
+            --red-light: #FFF0ED;
+            --orange: #B8651B;
+            --orange-light: #FFF5EB;
+            --grey-50: #FAFAF9;
+            --grey-100: #F4F3F1;
+            --grey-200: #E8E6E3;
+            --grey-300: #D4D1CC;
+            --grey-500: #8A8680;
+            --grey-700: #4A4744;
+            --grey-900: #1C1B1A;
+            --white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(20,30,60,0.06);
+            --shadow-md: 0 4px 16px rgba(20,30,60,0.08);
+            --shadow-lg: 0 12px 40px rgba(20,30,60,0.12);
+            --radius: 10px;
+            --radius-lg: 16px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy-dark);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--grey-900);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+            color: var(--white);
+            padding: 28px 36px;
+            text-align: center;
+        }
+        .header img { height: 56px; margin-bottom: 12px; }
+        .header h1 { font-family: 'DM Serif Display', serif; font-size: 1.5em; margin-bottom: 4px; color: var(--gold); }
+        .header p { font-size: 0.9em; opacity: 0.8; }
+        .progress-wrapper { margin-top: 18px; }
+        .step-indicator {
+            display: flex; justify-content: center; gap: 6px; margin-bottom: 10px;
+            font-size: 0.75em; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .step-indicator span { opacity: 0.4; }
+        .step-indicator span.active { opacity: 1; color: var(--gold); }
+        .progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.4s ease; }
+        .content { padding: 36px; }
+        .section { display: none; animation: fadeIn 0.35s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .section-title { font-family: 'DM Serif Display', serif; font-size: 1.3em; color: var(--navy); margin-bottom: 6px; }
+        .section-description { color: var(--grey-500); margin-bottom: 24px; font-size: 0.9em; }
+        .question { margin-bottom: 24px; }
+        .question-title { font-size: 0.95em; color: var(--grey-900); margin-bottom: 12px; font-weight: 600; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; color: var(--grey-700); font-weight: 600; margin-bottom: 6px; font-size: 0.85em; }
+        .form-group .required { color: var(--gold); }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 11px 14px; border: 2px solid var(--grey-200);
+            border-radius: var(--radius); font-size: 0.95em; font-family: inherit;
+            transition: all 0.2s; background: var(--white);
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(20,30,60,0.08);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width:600px) { .form-row { grid-template-columns: 1fr; } }
+        .options { display: flex; flex-direction: column; gap: 8px; }
+        .option {
+            background: var(--grey-50); padding: 12px 16px; border-radius: var(--radius);
+            cursor: pointer; transition: all 0.2s; border: 2px solid var(--grey-200);
+            display: flex; align-items: flex-start; gap: 10px;
+        }
+        .option:hover { background: var(--grey-100); border-color: var(--grey-300); }
+        .option input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--gold); flex-shrink: 0; margin-top: 3px; }
+        .option.selected { background: var(--gold-bg); border-color: var(--gold); }
+        .option label { cursor: pointer; flex: 1; user-select: none; font-size: 0.9em; }
+        .option-title { font-weight: 600; margin-bottom: 1px; }
+        .option-desc { font-size: 0.8em; color: var(--grey-500); }
+        .sector-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        @media (max-width:600px) { .sector-grid { grid-template-columns: 1fr; } }
+        .sector-card {
+            padding: 14px; background: var(--grey-50); border: 2px solid var(--grey-200);
+            border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .sector-card:hover { border-color: var(--grey-300); background: var(--grey-100); }
+        .sector-card.selected { border-color: var(--gold); background: var(--gold-bg); }
+        .sector-card input { display: none; }
+        .sector-card-title { font-weight: 700; color: var(--grey-900); margin-bottom: 2px; font-size: 0.9em; }
+        .sector-card-desc { font-size: 0.75em; color: var(--grey-500); }
+        .navigation { display: flex; justify-content: space-between; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--grey-200); gap: 10px; }
+        .btn {
+            padding: 12px 24px; border: none; border-radius: var(--radius); font-size: 0.9em;
+            font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--gold); color: var(--navy); }
+        .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-secondary { background: var(--grey-200); color: var(--grey-700); }
+        .btn-secondary:hover { background: var(--grey-300); }
+        .btn-success { background: var(--green); color: var(--white); }
+        .btn-success:hover { opacity: 0.9; }
+        .btn-navy { background: var(--navy); color: var(--gold); }
+        .btn-navy:hover { background: var(--navy-light); }
+        .btn svg { width: 16px; height: 16px; }
+        .results { display: none; }
+        .results.active { display: block; animation: fadeIn 0.4s ease; }
+        .results-header { text-align: center; margin-bottom: 28px; }
+        .results-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.4em; color: var(--navy); margin-bottom: 6px; }
+        .result-card {
+            background: var(--grey-50); padding: 20px; border-radius: var(--radius);
+            margin-bottom: 14px; border-left: 5px solid var(--grey-300);
+        }
+        .result-card.rank-1 { border-left-color: var(--green); background: var(--green-light); }
+        .result-card.rank-2 { border-left-color: var(--gold); background: var(--gold-bg); }
+        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+        .result-rank {
+            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            padding: 3px 10px; border-radius: 4px; color: var(--white);
+        }
+        .result-card.rank-1 .result-rank { background: var(--green); }
+        .result-card.rank-2 .result-rank { background: var(--gold); color: var(--navy); }
+        .result-card .result-rank { background: var(--grey-500); }
+        .result-title { font-family: 'DM Serif Display', serif; font-size: 1.15em; color: var(--navy); margin-bottom: 2px; }
+        .result-subtitle { font-size: 0.8em; color: var(--grey-500); margin-bottom: 10px; }
+        .result-description { color: var(--grey-700); font-size: 0.85em; margin-bottom: 14px; }
+        .result-missions { background: var(--white); padding: 14px; border-radius: var(--radius); }
+        .result-missions h4 { font-size: 0.85em; font-weight: 600; margin-bottom: 8px; }
+        .result-missions ul { margin: 0; padding-left: 16px; color: var(--grey-700); font-size: 0.8em; }
+        .result-missions li { margin-bottom: 4px; }
+        .simulator-section { margin-top: 36px; padding-top: 28px; border-top: 2px solid var(--grey-200); }
+        .simulator-title { font-family: 'DM Serif Display', serif; font-size: 1.2em; color: var(--navy); margin-bottom: 4px; }
+        .simulator-subtitle { color: var(--grey-500); font-size: 0.85em; margin-bottom: 20px; }
+        .simulator-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        @media (max-width:700px) { .simulator-inputs { grid-template-columns: 1fr; } }
+        .simulator-input label { display: block; font-size: 0.8em; font-weight: 600; color: var(--grey-700); margin-bottom: 4px; }
+        .simulator-input select {
+            width: 100%; padding: 10px; border: 2px solid var(--grey-200);
+            border-radius: var(--radius); font-size: 0.9em; font-weight: 600;
+            background: var(--gold-bg); color: var(--navy); cursor: pointer;
+        }
+        .simulator-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        @media (max-width:700px) { .simulator-results { grid-template-columns: 1fr; } }
+        .sim-card { padding: 18px; border-radius: var(--radius); text-align: center; }
+        .sim-card.cdi { background: var(--red-light); border: 2px solid #F5D5CE; }
+        .sim-card.apprenti { background: var(--green-light); border: 2px solid #C8E6C9; }
+        .sim-card.economie { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: var(--white); }
+        .sim-card-label { font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; opacity: 0.8; }
+        .sim-card-value { font-size: 1.4em; font-weight: 800; }
+        .sim-card.cdi .sim-card-value { color: var(--red); }
+        .sim-card.apprenti .sim-card-value { color: var(--green); }
+        .sim-card.economie .sim-card-value { color: var(--gold); }
+        .sim-card-sub { font-size: 0.75em; margin-top: 2px; opacity: 0.7; }
+        .sim-details { background: var(--grey-50); border-radius: var(--radius); padding: 18px; margin-top: 14px; }
+        .sim-details-title { font-size: 0.85em; font-weight: 700; margin-bottom: 10px; }
+        .sim-detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--grey-200); font-size: 0.85em; }
+        .sim-detail-row:last-child { border-bottom: none; font-weight: 700; padding-top: 10px; margin-top: 4px; border-top: 2px solid var(--grey-300); }
+        .sim-detail-label { color: var(--grey-700); }
+        .sim-detail-cdi { color: var(--red); font-weight: 600; }
+        .sim-detail-apprenti { color: var(--green); font-weight: 600; }
+        .sim-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; margin: 12px 0; }
+        .sim-badge.young { background: var(--green-light); color: var(--green); }
+        .sim-badge.mid { background: var(--orange-light); color: var(--orange); }
+        .sim-badge.senior { background: var(--gold-bg); color: var(--gold); }
+        .aide-info { background: var(--gold-bg); border: 2px solid var(--gold); border-radius: var(--radius); padding: 14px 18px; margin-top: 16px; font-size: 0.85em; }
+        .aide-info strong { color: var(--navy); }
+        /* Contact overlay */
+        .contact-section { margin-top: 36px; padding-top: 28px; border-top: 2px solid var(--gold); display: none; animation: fadeIn 0.35s ease; }
+        .contact-section.active { display: block; }
+        .action-buttons { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; justify-content: center; }
+        .cta-box {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+            border-radius: var(--radius-lg); padding: 28px; text-align: center; margin-top: 36px; color: var(--white);
+        }
+        .cta-box h3 { font-family: 'DM Serif Display', serif; color: var(--gold); font-size: 1.2em; margin-bottom: 8px; }
+        .cta-box p { font-size: 0.85em; opacity: 0.8; margin-bottom: 18px; }
+        .cta-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .footer-legal { font-size: 0.7em; color: var(--grey-500); text-align: center; padding: 16px 36px; border-top: 1px solid var(--grey-200); }
+        @media (max-width:768px) { .content { padding: 20px; } .header { padding: 20px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="data:image/jpeg;base64,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" alt="CADP">
+            <h1>Quel alternant pour votre entreprise ?</h1>
+            <p>3 etapes, 2 minutes — nous identifions le profil ideal pour vos besoins</p>
+            <div class="progress-wrapper">
+                <div class="step-indicator" id="stepIndicator">
+                    <span class="active">Etape 1 : Votre activite</span>
+                    <span>|</span>
+                    <span>Etape 2 : Vos missions</span>
+                    <span>|</span>
+                    <span>Etape 3 : Vos criteres</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
+        </div>
+        <div class="content">
+
+            <!-- ETAPE 1 : Secteur (leger, pas de donnees personnelles) -->
+            <div id="section1" class="section active">
+                <h2 class="section-title">Votre activite</h2>
+                <p class="section-description">Commencez par nous dire dans quel environnement l'alternant evoluera.</p>
+                <div class="question">
+                    <div class="question-title">Dans quel secteur exercez-vous ?</div>
+                    <div class="sector-grid">
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="commerce"><div class="sector-card-title">Commerce et Distribution</div><div class="sector-card-desc">Magasins, grandes surfaces, boutiques, e-commerce</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="medical"><div class="sector-card-title">Sante et Medical</div><div class="sector-card-desc">Cabinets, cliniques, EHPAD, pharmacies</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="banque"><div class="sector-card-title">Banque et Assurance</div><div class="sector-card-desc">Agences bancaires, courtage, assurances</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="services"><div class="sector-card-title">Services a la personne</div><div class="sector-card-desc">Aide a domicile, creches, associations</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="pme"><div class="sector-card-title">PME / TPE generaliste</div><div class="sector-card-desc">Tous secteurs, artisanat, liberal</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="industrie"><div class="sector-card-title">Industrie et Production</div><div class="sector-card-desc">Usines, logistique, BTP, nucleaire, energie</div></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Effectif de votre entreprise</label>
+                        <select id="effectif">
+                            <option value="1-10">1 a 10 salaries</option>
+                            <option value="11-49" selected>11 a 49 salaries</option>
+                            <option value="50-249">50 a 249 salaries</option>
+                            <option value="250+">250 salaries et plus</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Avez-vous deja accueilli un alternant ?</label>
+                        <select id="dejaAlternant">
+                            <option value="oui-cadp">Oui, via le CADP</option>
+                            <option value="oui-autre">Oui, via un autre CFA</option>
+                            <option value="non" selected>Non, ce serait une premiere</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <div></div>
+                    <button class="btn btn-primary" onclick="nextSection()">Suivant — les missions <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></button>
+                </div>
+            </div>
+
+            <!-- ETAPE 2 : Missions -->
+            <div id="section2" class="section">
+                <h2 class="section-title">Les missions du poste</h2>
+                <p class="section-description">Ne cherchez pas un diplome — cochez simplement les taches que vous souhaitez confier. Nous trouverons le bon profil pour vous.</p>
+                <div class="question">
+                    <div class="question-title">Missions commerciales</div>
+                    <div class="options">
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="vente"><label><div class="option-title">Vente et conseil client</div><div class="option-desc">Accueillir, conseiller, conclure des ventes en face a face ou par telephone</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="prospection"><label><div class="option-title">Prospection et developpement</div><div class="option-desc">Trouver de nouveaux clients, phoning, rendez-vous terrain, partenariats</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="negociation"><label><div class="option-title">Negociation commerciale</div><div class="option-desc">Negocier des contrats, des tarifs, repondre a des appels d'offres</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="digital"><label><div class="option-title">Communication digitale</div><div class="option-desc">Reseaux sociaux, site web, e-commerce, marketing en ligne</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="management"><label><div class="option-title">Management d'equipe</div><div class="option-desc">Animer, organiser, planifier et encadrer une equipe au quotidien</div></label></div>
+                    </div>
+                </div>
+                <div class="question">
+                    <div class="question-title">Missions administratives et gestion</div>
+                    <div class="options">
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="accueil"><label><div class="option-title">Accueil et standard</div><div class="option-desc">Accueil physique et telephonique, orientation des visiteurs</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="secretariat"><label><div class="option-title">Secretariat et gestion documentaire</div><div class="option-desc">Redaction, classement, courriers, archivage, organisation</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="compta"><label><div class="option-title">Comptabilite et facturation</div><div class="option-desc">Saisie comptable, factures, relances, tresorerie, declarations fiscales</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="rh"><label><div class="option-title">Gestion RH et paie</div><div class="option-desc">Contrats, plannings, elements de paie, recrutement, formation</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="stock"><label><div class="option-title">Gestion des stocks et approvisionnement</div><div class="option-desc">Commandes fournisseurs, reception, inventaires, logistique</div></label></div>
+                    </div>
+                </div>
+                <div class="question">
+                    <div class="question-title">Missions specifiques</div>
+                    <div class="options">
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="aide_personne"><label><div class="option-title">Accompagnement de personnes</div><div class="option-desc">Aide au quotidien, maintien a domicile, garde d'enfants, repas</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="banque"><label><div class="option-title">Conseil bancaire ou assurance</div><div class="option-desc">Produits financiers, credit, patrimoine, contrats d'assurance</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="qhse"><label><div class="option-title">Qualite, Securite, Environnement</div><div class="option-desc">Conformite, prevention des risques, audits, ISO, QHSE</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="rh_dev"><label><div class="option-title">Developpement RH et formation</div><div class="option-desc">GPEC, plan de formation, entretiens pro, marque employeur, QVT</div></label></div>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="previousSection()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path></svg> Retour</button>
+                    <button class="btn btn-primary" onclick="nextSection()">Suivant — vos criteres <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></button>
+                </div>
+            </div>
+
+            <!-- ETAPE 3 : Niveau, conditions, timing -->
+            <div id="section3" class="section">
+                <h2 class="section-title">Vos criteres</h2>
+                <p class="section-description">Derniere etape avant vos resultats personnalises.</p>
+                <div class="question">
+                    <div class="question-title">Quel niveau de formation recherchez-vous ?</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this)"><input type="radio" name="niveau" value="tp"><label><div class="option-title">Niveau CAP / Bac (Titre professionnel)</div><div class="option-desc">Formation en 12 mois, missions d'execution et d'assistance</div></label></div>
+                        <div class="option" onclick="selectOption(this)"><input type="radio" name="niveau" value="bts"><label><div class="option-title">Niveau Bac+2 (BTS)</div><div class="option-desc">Formation en 24 mois, technicien superieur polyvalent</div></label></div>
+                        <div class="option" onclick="selectOption(this)"><input type="radio" name="niveau" value="bachelor"><label><div class="option-title">Niveau Bac+3 (Bachelor)</div><div class="option-desc">Formation en 12 mois, responsabilites et expertise sectorielle</div></label></div>
+                        <div class="option" onclick="selectOption(this)"><input type="radio" name="niveau" value="indifferent"><label><div class="option-title">Indifferent — conseillez-moi</div><div class="option-desc">Le profil et la motivation comptent plus que le diplome</div></label></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="question">
+                        <div class="question-title">Quand souhaitez-vous accueillir l'alternant ?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="quand" value="sept2026"><label>Rentree septembre 2026</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="quand" value="asap"><label>Des que possible</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="quand" value="renseigne"><label>Je me renseigne pour plus tard</label></div>
+                        </div>
+                    </div>
+                    <div class="question">
+                        <div class="question-title">Quel rythme preferiez-vous ?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="rythme" value="2j3j"><label>2 jours campus / 3 jours entreprise</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="rythme" value="1s1s"><label>1 semaine campus / 1 semaine entreprise</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="rythme" value="indiff"><label>Pas de preference</label></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="question">
+                        <div class="question-title">Permis de conduire necessaire ?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="permis" value="oui"><label>Oui, indispensable</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="permis" value="non"><label>Non ou pas obligatoire</label></div>
+                        </div>
+                    </div>
+                    <div class="question">
+                        <div class="question-title">Travail le samedi ?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="samedi" value="oui"><label>Oui, regulierement</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="samedi" value="non"><label>Non ou exceptionnellement</label></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button class="btn btn-secondary" onclick="previousSection()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path></svg> Retour</button>
+                    <button class="btn btn-success" onclick="calculateResults()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Voir mes resultats</button>
+                </div>
+            </div>
+
+            <!-- RESULTATS -->
+            <div id="results" class="results">
+                <div class="results-header">
+                    <h2>Voici les profils recommandes pour votre besoin</h2>
+                    <p>Bases sur les missions que vous avez selectionnees et vos criteres</p>
+                </div>
+                <div id="resultsContainer"></div>
+
+                <!-- Simulateur -->
+                <div class="simulator-section">
+                    <h3 class="simulator-title">Combien coute un alternant ?</h3>
+                    <p class="simulator-subtitle">Comparaison avec un salarie en CDI au SMIC — base 2026 (12,02 EUR/h) et nouvelles aides (Decret 2026-168)</p>
+                    <div class="simulator-inputs">
+                        <div class="simulator-input"><label>Age de l'alternant</label>
+                            <select id="simAge" onchange="updateSimulator()">
+                                <option value="17">16-17 ans</option><option value="19">18-20 ans</option>
+                                <option value="23" selected>21-25 ans</option><option value="27">26 ans et +</option>
+                            </select>
+                        </div>
+                        <div class="simulator-input"><label>Formation</label>
+                            <select id="simFormation" onchange="updateSimulator()">
+                                <option value="tp-12">Titre professionnel (12 mois)</option>
+                                <option value="bts-24" selected>BTS (24 mois)</option>
+                                <option value="bachelor-12">Bachelor (12 mois)</option>
+                            </select>
+                        </div>
+                        <div class="simulator-input"><label>Reconnaissance handicap</label>
+                            <select id="simHandicap" onchange="updateSimulator()">
+                                <option value="non" selected>Non</option><option value="oui">Oui (RQTH)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="simBadge" class="sim-badge mid"></div>
+                    <div class="simulator-results">
+                        <div class="sim-card cdi"><div class="sim-card-label">Cout salarie CDI</div><div class="sim-card-value" id="simCoutCDI">--</div><div class="sim-card-sub">sur la duree du contrat</div></div>
+                        <div class="sim-card apprenti"><div class="sim-card-label">Cout alternant</div><div class="sim-card-value" id="simCoutApprenti">--</div><div class="sim-card-sub">aide deduite</div></div>
+                        <div class="sim-card economie"><div class="sim-card-label">Votre economie</div><div class="sim-card-value" id="simEconomie">--</div><div class="sim-card-sub" id="simEconomiePct">--</div></div>
+                    </div>
+                    <div class="sim-details">
+                        <div class="sim-details-title">Detail du calcul</div>
+                        <div class="sim-detail-row"><span class="sim-detail-label">Salaire brut</span><span class="sim-detail-cdi" id="simBrutCDI">--</span><span class="sim-detail-apprenti" id="simBrutApprenti">--</span></div>
+                        <div class="sim-detail-row"><span class="sim-detail-label">Charges patronales</span><span class="sim-detail-cdi" id="simChargesCDI">--</span><span class="sim-detail-apprenti" id="simChargesApprenti">--</span></div>
+                        <div class="sim-detail-row"><span class="sim-detail-label">Aide employeur (1ere annee)</span><span class="sim-detail-cdi">--</span><span class="sim-detail-apprenti" id="simAide">--</span></div>
+                        <div class="sim-detail-row"><span class="sim-detail-label">Cout total employeur</span><span class="sim-detail-cdi" id="simTotalCDI">--</span><span class="sim-detail-apprenti" id="simTotalApprenti">--</span></div>
+                    </div>
+                    <div class="aide-info" id="aideInfo"></div>
+                    <p style="font-size:0.72em;color:var(--grey-500);margin-top:14px;text-align:center;">Calcul indicatif — SMIC au 01/01/2026 (12,02 EUR/h) — Decret n. 2026-168 du 06/03/2026 — Charges estimees (source IFIR).</p>
+                </div>
+
+                <!-- CTA : contact seulement apres avoir vu les resultats -->
+                <div class="cta-box">
+                    <h3>Interesse(e) ? Passons a l'action.</h3>
+                    <p>Recevez des CV correspondant a votre besoin ou inscrivez-vous a notre prochain Alternance Dating.</p>
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary" onclick="showContact()">Je souhaite etre recontacte(e)</button>
+                        <button class="btn btn-secondary" onclick="exportPDF()" style="background:var(--white);color:var(--navy);">Telecharger le PDF</button>
+                        <button class="btn btn-secondary" onclick="restartQuiz()" style="background:rgba(255,255,255,0.15);color:var(--white);">Recommencer</button>
+                    </div>
+                </div>
+
+                <!-- Formulaire de contact (cache, revele au clic) -->
+                <div id="contactSection" class="contact-section">
+                    <h2 class="section-title">Vos coordonnees</h2>
+                    <p class="section-description">Pour que nous puissions vous recontacter et vous envoyer des profils adaptes.</p>
+                    <div class="form-row">
+                        <div class="form-group"><label>Nom de l'entreprise <span class="required">*</span></label><input type="text" id="entreprise" placeholder="Raison sociale"></div>
+                        <div class="form-group"><label>SIRET</label><input type="text" id="siret" placeholder="14 chiffres (facultatif)"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" id="nom" placeholder="Votre nom"></div>
+                        <div class="form-group"><label>Prenom <span class="required">*</span></label><input type="text" id="prenom" placeholder="Votre prenom"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Fonction</label><input type="text" id="fonction" placeholder="Ex: Gerant, DRH..."></div>
+                        <div class="form-group"><label>Telephone <span class="required">*</span></label><input type="tel" id="telephone" placeholder="06 12 34 56 78"></div>
+                    </div>
+                    <div class="form-group"><label>Email <span class="required">*</span></label><input type="email" id="email" placeholder="votre@email.com"></div>
+                    <div class="form-group"><label>Un commentaire ? Une precision sur votre besoin ?</label><textarea id="commentaire" rows="3" placeholder="Facultatif — dites-nous ce qui est important pour vous"></textarea></div>
+                    <div style="text-align:center;margin-top:20px;">
+                        <button class="btn btn-success" onclick="sendEmail()" style="font-size:1em;padding:14px 36px;">Envoyer ma demande au CADP</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-legal">(c) CADP 2026 — Campus Alternance Drome Provence — UFA du CFA IFIR Lyon<br>2 bd Frederic Mistral, 26700 Pierrelatte — Donnees indicatives, non contractuelles.</div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+    let currentSection = 1;
+    const totalSections = 3;
+    const stepLabels = [
+        ['Etape 1 : Votre activite', 'Etape 2 : Vos missions', 'Etape 3 : Vos criteres'],
+    ];
+
+    const formations = {
+        gpme: { name:"BTS GPME", full:"Gestion de la PME", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
+            desc:"Profil polyvalent : bras droit du dirigeant. Administration, gestion, RH, relation clients et fournisseurs.",
+            missions:["Gerer la relation clients et fournisseurs","Assurer le suivi comptable et financier","Participer a la gestion RH (contrats, paie, planning)","Contribuer au developpement commercial","Organiser et planifier les activites de la PME"], p:0 },
+        ndrc: { name:"BTS NDRC", full:"Negociation et Digitalisation de la Relation Client", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
+            desc:"Profil commercial terrain avec forte dimension digitale. Prospection, negociation, fidelisation.",
+            missions:["Prospecter et developper le portefeuille clients","Negocier et conclure des ventes","Animer la relation client digitale (reseaux, e-commerce)","Fideliser et developper les partenariats","Analyser les performances commerciales"], p:0 },
+        mco: { name:"BTS MCO", full:"Management Commercial Operationnel", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
+            desc:"Profil manager de point de vente. Animation d'equipe, gestion de rayon, pilotage des resultats.",
+            missions:["Accueillir, conseiller et vendre","Manager et animer l'equipe commerciale","Gerer et mettre en valeur l'offre produits","Analyser les indicateurs de performance","Organiser les operations commerciales"], p:0 },
+        cg: { name:"BTS CG", full:"Comptabilite et Gestion", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
+            desc:"Profil comptable et gestionnaire. Saisie, declarations fiscales, controle de gestion, outils numeriques.",
+            missions:["Realiser les operations comptables courantes","Etablir et controler les declarations fiscales","Produire les etats financiers","Assurer le suivi de tresorerie","Participer au controle de gestion"], p:0 },
+        mos: { name:"BTS MOS", full:"Management Operationnel de la Securite", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
+            desc:"Profil responsable securite et surete. Management d'equipe, gestion des risques, conformite reglementaire.",
+            missions:["Manager les equipes de securite","Piloter la qualite et la conformite","Gerer les ressources humaines et le materiel","Assurer la relation client et les reporting","Analyser les risques et ameliorer les processus"], p:0 },
+        advf: { name:"TP ADVF", full:"Assistant(e) De Vie aux Familles", niveau:"Niveau 3 (CAP)", nc:3, duree:"12 mois", dm:12,
+            desc:"Profil aide a domicile. Accompagnement des personnes fragiles, garde d'enfants, entretien du cadre de vie.",
+            missions:["Accompagner les personnes dans les actes du quotidien","Aider au maintien a domicile","Assurer la garde et l'eveil des enfants","Entretenir le domicile","Preparer les repas"], p:0 },
+        amum: { name:"TP AMUM", full:"Assistant Manager d'Unite Marchande", niveau:"Niveau 4 (Bac)", nc:4, duree:"12 mois", dm:12,
+            desc:"Profil adjoint de responsable en commerce. Gestion de rayon, stocks, animation d'equipe.",
+            missions:["Gerer l'approvisionnement et les stocks","Participer au merchandising","Animer et coordonner l'equipe de vente","Contribuer a l'atteinte des objectifs","Suivre les indicateurs de performance"], p:0 },
+        bachelor_qhse: { name:"Bachelor QHSE", full:"Qualite Hygiene Securite Environnement", niveau:"Bac+3", nc:6, duree:"12 mois", dm:12,
+            desc:"Profil responsable prevention et conformite. Systeme qualite, audits internes, securite, environnement.",
+            missions:["Mettre en place le systeme qualite","Animer la prevention des risques","Realiser les audits internes","Former le personnel","Assurer la veille reglementaire"], p:0 },
+        bachelor_banque: { name:"Bachelor Banque Assurance", full:"Charge(e) de Clientele Banque Assurance", niveau:"Bac+3", nc:6, duree:"12 mois", dm:12,
+            desc:"Profil conseiller expert en produits financiers et assurantiels. Gestion de portefeuille.",
+            missions:["Conseiller sur les produits bancaires","Proposer des solutions d'assurance","Analyser les besoins patrimoniaux","Developper et fideliser un portefeuille","Suivre les dossiers de credit"], p:0 },
+        bachelor_rh: { name:"Bachelor CDRH", full:"Charge(e) de Developpement des Ressources Humaines", niveau:"Bac+3", nc:6, duree:"12 mois", dm:12,
+            desc:"Profil RH operationnel. Recrutement, formation, GPEC, marque employeur, droit social.",
+            missions:["Piloter le recrutement","Elaborer le plan de formation","Gerer les entretiens pro et la GPEC","Contribuer a la marque employeur","Assurer la veille en droit social"], p:0 },
+    };
+
+    function getAide(nc, effectif, rqth) {
+        if (rqth) return 6000;
+        const grand = effectif === '250+';
+        if (!grand) { if (nc<=4) return 6000; if (nc===5) return 4500; return 2000; }
+        else { if (nc<=4) return 2000; if (nc===5) return 1500; return 750; }
+    }
+
+    const SMIC_H=12.02, SMIC_M=1823.03, H_AN=1820;
+
+    function updateUI() {
+        document.getElementById('progressFill').style.width = (currentSection/totalSections*100)+'%';
+        const spans = document.querySelectorAll('#stepIndicator span');
+        const stepIdx = [0,2,4];
+        spans.forEach((s,i) => s.classList.remove('active'));
+        if (currentSection <= 3) { spans[stepIdx[currentSection-1]].classList.add('active'); }
+    }
+
+    function nextSection() {
+        if (currentSection < totalSections) {
+            document.getElementById('section'+currentSection).classList.remove('active');
+            currentSection++;
+            document.getElementById('section'+currentSection).classList.add('active');
+            updateUI(); window.scrollTo(0,0);
+        }
+    }
+    function previousSection() {
+        if (currentSection > 1) {
+            document.getElementById('section'+currentSection).classList.remove('active');
+            currentSection--;
+            document.getElementById('section'+currentSection).classList.add('active');
+            updateUI(); window.scrollTo(0,0);
+        }
+    }
+
+    function selectOption(el) {
+        const inp=el.querySelector('input'), name=inp.name;
+        document.querySelectorAll('input[name="'+name+'"]').forEach(o => o.closest('.option').classList.remove('selected'));
+        inp.checked=true; el.classList.add('selected');
+    }
+    function selectSectorCard(el) {
+        const inp=el.querySelector('input'), name=inp.name;
+        document.querySelectorAll('input[name="'+name+'"]').forEach(o => o.closest('.sector-card').classList.remove('selected'));
+        inp.checked=true; el.classList.add('selected');
+    }
+    function selectMultipleOption(el) {
+        const inp=el.querySelector('input'); inp.checked=!inp.checked; el.classList.toggle('selected',inp.checked);
+    }
+
+    function calculateResults() {
+        Object.keys(formations).forEach(k => formations[k].p=0);
+        const secteur = document.querySelector('input[name="secteur"]:checked');
+        if (secteur) {
+            const v=secteur.value;
+            if (v==='commerce') { formations.mco.p+=40; formations.amum.p+=35; formations.ndrc.p+=25; }
+            else if (v==='medical') { formations.advf.p+=50; }
+            else if (v==='banque') { formations.bachelor_banque.p+=55; formations.ndrc.p+=10; }
+            else if (v==='services') { formations.advf.p+=50; formations.mos.p+=15; formations.bachelor_rh.p+=10; }
+            else if (v==='pme') { formations.gpme.p+=45; formations.cg.p+=25; formations.bachelor_rh.p+=15; }
+            else if (v==='industrie') { formations.bachelor_qhse.p+=45; formations.mos.p+=30; formations.gpme.p+=15; }
+        }
+        document.querySelectorAll('input[name="mc"]:checked').forEach(i => {
+            const v=i.value;
+            if (v==='vente') { formations.mco.p+=30; formations.amum.p+=20; formations.ndrc.p+=20; formations.bachelor_banque.p+=10; }
+            else if (v==='prospection') { formations.ndrc.p+=40; formations.bachelor_banque.p+=15; }
+            else if (v==='negociation') { formations.ndrc.p+=35; formations.bachelor_banque.p+=20; }
+            else if (v==='digital') { formations.ndrc.p+=30; formations.mco.p+=10; }
+            else if (v==='management') { formations.mco.p+=35; formations.amum.p+=25; formations.mos.p+=30; }
+        });
+        document.querySelectorAll('input[name="ma"]:checked').forEach(i => {
+            const v=i.value;
+            if (v==='accueil') { formations.gpme.p+=25; }
+            else if (v==='secretariat') { formations.gpme.p+=30; }
+            else if (v==='compta') { formations.cg.p+=50; formations.gpme.p+=15; }
+            else if (v==='rh') { formations.gpme.p+=25; formations.bachelor_rh.p+=45; }
+            else if (v==='stock') { formations.amum.p+=35; formations.mco.p+=20; }
+        });
+        document.querySelectorAll('input[name="ms"]:checked').forEach(i => {
+            const v=i.value;
+            if (v==='aide_personne') formations.advf.p+=55;
+            else if (v==='banque') formations.bachelor_banque.p+=55;
+            else if (v==='qhse') { formations.bachelor_qhse.p+=55; formations.mos.p+=10; }
+            else if (v==='rh_dev') { formations.bachelor_rh.p+=55; formations.gpme.p+=5; }
+        });
+        const niveau=document.querySelector('input[name="niveau"]:checked');
+        if (niveau) {
+            const v=niveau.value;
+            if (v==='tp') { formations.advf.p+=20; formations.amum.p+=20; }
+            else if (v==='bts') { Object.keys(formations).forEach(k=>{if(formations[k].nc===5)formations[k].p+=12;}); }
+            else if (v==='bachelor') { Object.keys(formations).forEach(k=>{if(formations[k].nc===6)formations[k].p+=15;}); }
+        }
+        const permis=document.querySelector('input[name="permis"]:checked');
+        if (permis && permis.value==='oui') { formations.ndrc.p+=5; formations.advf.p+=5; }
+        const samedi=document.querySelector('input[name="samedi"]:checked');
+        if (samedi && samedi.value==='oui') { formations.mco.p+=10; formations.amum.p+=10; }
+
+        displayResults();
+    }
+
+    function displayResults() {
+        const eff = document.getElementById('effectif').value;
+        const sorted = Object.entries(formations).sort((a,b)=>b[1].p-a[1].p).filter(f=>f[1].p>0);
+        const container = document.getElementById('resultsContainer');
+        container.innerHTML = '';
+        const maxPts = sorted.length > 0 ? sorted[0][1].p : 1;
+
+        sorted.slice(0,3).forEach(([key,data],i) => {
+            const rc = i<2?'rank-'+(i+1):'';
+            const rt = i===0?'Meilleure correspondance':i===1?'Tres adapte':'Adapte';
+            const pct = Math.round(data.p/maxPts*100);
+            const aide = getAide(data.nc, eff, false);
+            container.innerHTML += '<div class="result-card '+rc+'"><div class="result-header"><span class="result-rank">'+rt+' ('+pct+'%)</span></div>'+
+                '<h3 class="result-title">'+data.name+'</h3><p class="result-subtitle">'+data.full+' — '+data.niveau+' — '+data.duree+' — Aide employeur : '+aide.toLocaleString('fr-FR')+' EUR</p>'+
+                '<p class="result-description">'+data.desc+'</p><div class="result-missions"><h4>Missions confiables a ce profil :</h4><ul>'+
+                data.missions.map(m=>'<li>'+m+'</li>').join('')+'</ul></div></div>';
+        });
+
+        if (sorted.length>0) {
+            const top=sorted[0][1];
+            const sim=document.getElementById('simFormation');
+            if (top.nc<=4) sim.value='tp-12'; else if (top.nc===5) sim.value='bts-24'; else sim.value='bachelor-12';
+        }
+
+        document.getElementById('section'+currentSection).classList.remove('active');
+        document.getElementById('results').classList.add('active');
+        // Update step indicator to show "Resultats"
+        document.querySelectorAll('#stepIndicator span').forEach(s=>s.classList.remove('active'));
+        document.getElementById('progressFill').style.width='100%';
+        updateSimulator();
+        window.scrollTo(0,0);
+    }
+
+    function showContact() {
+        document.getElementById('contactSection').classList.add('active');
+        document.getElementById('contactSection').scrollIntoView({behavior:'smooth'});
+    }
+
+    function updateSimulator() {
+        const age=parseInt(document.getElementById('simAge').value);
+        const [type,dureeStr]=document.getElementById('simFormation').value.split('-');
+        const duree=parseInt(dureeStr);
+        const rqth=document.getElementById('simHandicap').value==='oui';
+        const eff=document.getElementById('effectif').value;
+
+        let tranche,taux,bc,nc;
+        if (age<18){tranche='16-17 ans';taux=0.27;bc='young';}
+        else if (age<21){tranche='18-20 ans';taux=0.43;bc='young';}
+        else if (age<26){tranche='21-25 ans';taux=0.53;bc='mid';}
+        else{tranche='26 ans et +';taux=1.00;bc='senior';}
+
+        if (type==='tp') nc=4; else if (type==='bts') nc=5; else nc=6;
+        const aide=getAide(nc,eff,rqth);
+        const chTaux = (eff==='250+'||eff==='50-249') ? 0.077 : 0.016;
+
+        const hFormAn = type==='bts'?675:(type==='bachelor'?600:450);
+        const hEnt = (H_AN-hFormAn)*(duree/12);
+        const brutCDI = SMIC_H*hEnt;
+        const chargesCDI = brutCDI*0.25;
+        const coutCDI = brutCDI+chargesCDI;
+        const brutMens = SMIC_M*taux;
+        const brutApp = brutMens*duree;
+        const chargesApp = brutApp*chTaux;
+        const coutBrut = brutApp+chargesApp;
+        const coutNet = coutBrut-aide;
+        const eco = coutCDI-coutNet;
+        const ecoPct = coutCDI>0?(eco/coutCDI*100):0;
+
+        const badge=document.getElementById('simBadge');
+        badge.textContent=tranche+' : '+Math.round(taux*100)+'% du SMIC ('+Math.round(brutMens)+' EUR brut/mois)';
+        badge.className='sim-badge '+bc;
+
+        document.getElementById('simCoutCDI').textContent=fmt(coutCDI);
+        document.getElementById('simCoutApprenti').textContent=fmt(coutNet);
+        document.getElementById('simEconomie').textContent=fmt(eco);
+        document.getElementById('simEconomiePct').textContent='soit '+Math.round(ecoPct)+'% d\'economie';
+        document.getElementById('simBrutCDI').textContent=fmt(brutCDI);
+        document.getElementById('simBrutApprenti').textContent=fmt(brutApp);
+        document.getElementById('simChargesCDI').textContent=fmt(chargesCDI);
+        document.getElementById('simChargesApprenti').textContent=fmt(chargesApp);
+        document.getElementById('simAide').textContent='- '+fmt(aide);
+        document.getElementById('simTotalCDI').textContent=fmt(coutCDI);
+        document.getElementById('simTotalApprenti').textContent=fmt(coutNet);
+
+        const grand=eff==='250+';
+        let at='<strong>Aide applicable : '+aide.toLocaleString('fr-FR')+' EUR</strong> (1ere annee)<br>';
+        if (rqth) at+='Majoration RQTH : 6 000 EUR quel que soit le niveau de formation.';
+        else if (!grand&&nc<=4) at+='Aide unique a l\'apprentissage — entreprise de moins de 250 salaries, niveau CAP/Bac.';
+        else if (!grand&&nc===5) at+='Aide exceptionnelle (decret 2026-168) — moins de 250 salaries, niveau BTS.';
+        else if (!grand&&nc>=6) at+='Aide exceptionnelle (decret 2026-168) — moins de 250 salaries, niveau Bachelor.';
+        else at+='Aide exceptionnelle (decret 2026-168) — entreprise de 250 salaries et plus.';
+        at+='<br>Contrats conclus avant le 1er janvier 2027. Versement mensuel la 1ere annee.';
+        document.getElementById('aideInfo').innerHTML=at;
+    }
+
+    function fmt(n){return Math.round(n).toLocaleString('fr-FR')+' EUR';}
+
+    function getFormData() {
+        return {
+            entreprise: document.getElementById('entreprise').value.trim(),
+            nom: document.getElementById('nom').value.trim(),
+            prenom: document.getElementById('prenom').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            telephone: document.getElementById('telephone').value.trim(),
+            fonction: document.getElementById('fonction').value.trim(),
+            commentaire: document.getElementById('commentaire').value.trim(),
+        };
+    }
+
+    function exportPDF() {
+        const fd = getFormData();
+        const {jsPDF}=window.jspdf;
+        const doc=new jsPDF();
+        let y=20;const pw=doc.internal.pageSize.width,m=20;
+
+        doc.setFontSize(14);doc.setTextColor(20,30,60);doc.setFont("helvetica","bold");
+        doc.text("CADP — Recommandation de formation en alternance",pw/2,y,{align:"center"});y+=12;
+
+        if (fd.entreprise) {
+            doc.setFontSize(9);doc.setFont("helvetica","normal");doc.setTextColor(50,50,50);
+            doc.text('Entreprise : '+fd.entreprise,m,y);y+=5;
+            if(fd.nom)doc.text('Contact : '+fd.prenom+' '+fd.nom+(fd.fonction?' — '+fd.fonction:''),m,y);y+=5;
+            if(fd.email)doc.text('Email : '+fd.email+(fd.telephone?' | Tel : '+fd.telephone:''),m,y);y+=10;
+        }
+
+        doc.setFontSize(11);doc.setFont("helvetica","bold");doc.setTextColor(20,30,60);
+        doc.text("Formations recommandees",m,y);y+=8;
+
+        const eff=document.getElementById('effectif').value;
+        const sorted=Object.entries(formations).sort((a,b)=>b[1].p-a[1].p).filter(f=>f[1].p>0).slice(0,3);
+        doc.setFontSize(9);
+        sorted.forEach((f,i)=>{
+            const d=f[1],aide=getAide(d.nc,eff,false);
+            doc.setFont("helvetica","bold");doc.setTextColor(i===0?[27,107,58]:[100,100,100]);
+            doc.text((i+1)+'. '+d.name+' — '+d.full,m,y);y+=5;
+            doc.setFont("helvetica","normal");doc.setTextColor(100,100,100);
+            doc.text('   '+d.niveau+' | '+d.duree+' | Aide : '+aide.toLocaleString('fr-FR')+' EUR',m,y);y+=7;
+        });
+        y+=3;
+        doc.setFontSize(11);doc.setFont("helvetica","bold");doc.setTextColor(20,30,60);
+        doc.text("Simulation de cout",m,y);y+=7;
+        doc.setFontSize(9);doc.setFont("helvetica","normal");
+        doc.text('Cout CDI equivalent : '+document.getElementById('simCoutCDI').textContent,m,y);y+=5;
+        doc.text('Cout alternant (aide deduite) : '+document.getElementById('simCoutApprenti').textContent,m,y);y+=5;
+        doc.setFont("helvetica","bold");doc.setTextColor(27,107,58);
+        doc.text('Economie : '+document.getElementById('simEconomie').textContent+' ('+document.getElementById('simEconomiePct').textContent+')',m,y);
+
+        doc.setFontSize(7);doc.setTextColor(150,150,150);
+        doc.text("CADP — Campus Alternance Drome Provence — 2 bd Frederic Mistral, 26700 Pierrelatte — (c) 2026",pw/2,doc.internal.pageSize.height-10,{align:"center"});
+
+        const filename = fd.entreprise ? 'Recommandation_'+fd.entreprise+'.pdf' : 'Recommandation_CADP.pdf';
+        doc.save(filename);
+    }
+
+    // ===== CONFIGURATION =====
+    // Cette URL sera remplacee automatiquement via le panneau ?config
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_2OXPJpqF30VUr8nBdy3k-oiAgcLX1YbDxMOD8VbZ4iKFTtzsAGKEs1K7actvRktKrw/exec';
+
+    // Panneau de configuration (accessible via ?config dans l'URL)
+    if (window.location.search.indexOf('config') !== -1) {
+        document.querySelector('.container').innerHTML =
+        '<div style="padding:48px;max-width:600px;margin:0 auto;">'
+        +'<div style="text-align:center;margin-bottom:32px;">'
+        +'<h1 style="font-family:DM Serif Display,serif;color:#141E3C;font-size:1.6em;margin-bottom:8px;">Configuration du questionnaire</h1>'
+        +'<p style="color:#8A8680;font-size:0.9em;">Cette page n\'est visible que par vous (via ?config dans l\'URL).</p>'
+        +'</div>'
+
+        +'<div style="background:#F8F3E6;border:2px solid #C9A84C;border-radius:10px;padding:24px;margin-bottom:24px;">'
+        +'<h3 style="color:#141E3C;margin-bottom:12px;font-size:1em;">Etape 1 — Collez votre URL Google Apps Script</h3>'
+        +'<p style="color:#4A4744;font-size:0.85em;margin-bottom:12px;">C\'est l\'URL que Google vous a donnee quand vous avez deploye le script (elle commence par https://script.google.com/macros/...)</p>'
+        +'<input id="configUrl" type="text" placeholder="https://script.google.com/macros/s/AKfycb.../exec" style="width:100%;padding:12px;border:2px solid #E8E6E3;border-radius:8px;font-size:0.9em;font-family:inherit;margin-bottom:8px;">'
+        +'<p id="configStatus" style="font-size:0.8em;color:#8A8680;"></p>'
+        +'</div>'
+
+        +'<div style="background:#E8F5E9;border:2px solid #C8E6C9;border-radius:10px;padding:24px;margin-bottom:24px;">'
+        +'<h3 style="color:#1B6B3A;margin-bottom:12px;font-size:1em;">Etape 2 — Generez votre fichier</h3>'
+        +'<p style="color:#4A4744;font-size:0.85em;margin-bottom:16px;">Cliquez sur le bouton ci-dessous. Vous obtiendrez un fichier index.html pret a deployer sur GitHub Pages, avec votre URL integree.</p>'
+        +'<button id="configBtn" onclick="generateConfiguredFile()" style="background:#1B6B3A;color:white;border:none;padding:14px 28px;border-radius:8px;font-size:0.95em;font-weight:600;cursor:pointer;font-family:inherit;width:100%;">Generer mon fichier index.html</button>'
+        +'</div>'
+
+        +'<div style="background:#F4F3F1;border-radius:10px;padding:24px;">'
+        +'<h3 style="color:#141E3C;margin-bottom:12px;font-size:1em;">Etape 3 — Uploadez sur GitHub</h3>'
+        +'<p style="color:#4A4744;font-size:0.85em;">Allez sur votre depot GitHub > Add file > Upload files > deposez le fichier telecharge > Commit changes. Votre site sera mis a jour en 1-2 minutes.</p>'
+        +'</div>'
+
+        +'<div style="text-align:center;margin-top:24px;">'
+        +'<a href="?" style="color:#C9A84C;font-size:0.85em;">Voir le questionnaire tel que les entreprises le voient</a>'
+        +'</div>'
+        +'</div>';
+    }
+
+    function generateConfiguredFile() {
+        var url = document.getElementById('configUrl').value.trim();
+        if (!url || !url.startsWith('https://script.google.com/')) {
+            document.getElementById('configStatus').textContent = 'L\'URL doit commencer par https://script.google.com/macros/...';
+            document.getElementById('configStatus').style.color = '#A63D2F';
+            return;
+        }
+        document.getElementById('configStatus').textContent = 'URL valide.';
+        document.getElementById('configStatus').style.color = '#1B6B3A';
+
+        // Recuperer le code source complet de cette page
+        var fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        // Remplacer le placeholder par la vraie URL
+        fullHtml = fullHtml.replace("const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_2OXPJpqF30VUr8nBdy3k-oiAgcLX1YbDxMOD8VbZ4iKFTtzsAGKEs1K7actvRktKrw/exec'", "const SCRIPT_URL = '" + url + "'");
+        // Retirer le panneau de config du fichier genere (il ne doit pas apparaitre pour les visiteurs)
+        // On ne le retire pas - il n'apparait que si ?config est dans l'URL, donc pas de souci
+
+        // Telecharger
+        var blob = new Blob([fullHtml], {type:'text/html'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'index.html';
+        a.click();
+
+        document.getElementById('configBtn').textContent = 'Fichier telecharge !';
+        document.getElementById('configBtn').style.background = '#C9A84C';
+    }
+
+    function sendEmail() {
+        const fd=getFormData();
+        if (!fd.entreprise||!fd.nom||!fd.email||!fd.telephone) { alert('Merci de remplir au minimum : entreprise, nom, email et telephone.'); return; }
+
+        const eff=document.getElementById('effectif').value;
+        const deja=document.getElementById('dejaAlternant').value;
+        const sorted=Object.entries(formations).sort((a,b)=>b[1].p-a[1].p).filter(f=>f[1].p>0).slice(0,3);
+        const secteur=document.querySelector('input[name="secteur"]:checked');
+        const quand=document.querySelector('input[name="quand"]:checked');
+        const rythme=document.querySelector('input[name="rythme"]:checked');
+
+        const payload = {
+            entreprise: fd.entreprise, nom: fd.nom, prenom: fd.prenom,
+            fonction: fd.fonction, email: fd.email, telephone: fd.telephone,
+            effectif: eff,
+            dejaAlternant: deja==='oui-cadp'?'Oui (CADP)':deja==='oui-autre'?'Oui (autre CFA)':'Non',
+            secteur: secteur?secteur.value:'',
+            quand: quand?(quand.value==='sept2026'?'Septembre 2026':quand.value==='asap'?'Des que possible':'Se renseigne'):'',
+            rythme: rythme?(rythme.value==='2j3j'?'2j campus / 3j entreprise':rythme.value==='1s1s'?'1 sem / 1 sem':'Indifferent'):'',
+            formation1: sorted[0]?sorted[0][1].name+' — '+sorted[0][1].full:'',
+            formation2: sorted[1]?sorted[1][1].name+' — '+sorted[1][1].full:'',
+            formation3: sorted[2]?sorted[2][1].name+' — '+sorted[2][1].full:'',
+            economie: document.getElementById('simEconomie').textContent,
+            aide: document.getElementById('simAide').textContent.replace('- ',''),
+            commentaire: fd.commentaire
+        };
+
+        var btn = document.querySelector('#contactSection .btn-success');
+        var originalText = btn.textContent;
+
+        // Si le script Google n'est pas encore configure, fallback mailto
+        if (SCRIPT_URL === 'PAS_ENCORE_CONFIGURE') {
+            var subject='Demande alternance — '+fd.entreprise;
+            var body='ENTREPRISE : '+fd.entreprise+'\nCONTACT : '+fd.prenom+' '+fd.nom+'\nFONCTION : '+(fd.fonction||'-')+'\nEMAIL : '+fd.email+'\nTEL : '+fd.telephone+'\nEFFECTIF : '+eff+'\nECHEANCE : '+(payload.quand||'-')+'\nRYTHME : '+(payload.rythme||'-')+'\n\nFORMATIONS :\n1. '+payload.formation1+'\n2. '+payload.formation2+(payload.formation3?'\n3. '+payload.formation3:'')+'\n\nECONOMIE : '+payload.economie+'\nAIDE : '+payload.aide+(fd.commentaire?'\n\nCOMMENTAIRE : '+fd.commentaire:'')+'\n\nCordialement,\n'+fd.prenom+' '+fd.nom;
+            window.location.href='mailto:contact@cadp.pro?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+            return;
+        }
+
+        // Envoi vers Google Sheets
+        btn.textContent = 'Envoi en cours...';
+        btn.disabled = true;
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(payload)
+        }).then(function() {
+            document.getElementById('contactSection').innerHTML =
+                '<div style="text-align:center;padding:40px 20px;">'
+                +'<div style="width:60px;height:60px;border-radius:50%;background:#E8F5E9;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;"><svg width="28" height="28" fill="none" stroke="#1B6B3A" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>'
+                +'<h2 style="font-family:DM Serif Display,serif;color:#141E3C;margin-bottom:12px;">Demande bien recue !</h2>'
+                +'<p style="color:#4A4744;margin-bottom:8px;">Merci <strong>'+payload.prenom+'</strong>, nous avons enregistre votre demande pour <strong>'+payload.entreprise+'</strong>.</p>'
+                +'<p style="color:#4A4744;margin-bottom:20px;">Un conseiller CADP vous recontactera dans les meilleurs delais.</p>'
+                +'<p style="font-size:0.85em;color:#8A8680;">Campus Alternance Drome Provence<br>04 75 00 34 56 — contact@cadp.pro</p>'
+                +'</div>';
+        }).catch(function() {
+            btn.textContent = 'Erreur — reessayez';
+            btn.disabled = false;
+            setTimeout(function(){ btn.textContent = originalText; btn.disabled = false; }, 3000);
+        });
+    }
+
+    function restartQuiz() {
+        Object.keys(formations).forEach(k=>formations[k].p=0);
+        document.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(i=>{
+            i.checked=false; const p=i.closest('.option')||i.closest('.sector-card'); if(p)p.classList.remove('selected');
+        });
+        document.querySelectorAll('#contactSection input,#contactSection textarea').forEach(i=>i.value='');
+        document.getElementById('results').classList.remove('active');
+        document.getElementById('contactSection').classList.remove('active');
+        document.getElementById('section1').classList.add('active');
+        currentSection=1; updateUI(); window.scrollTo(0,0);
+    }
+
+    updateUI();
+    </script>
+</body>
+</html>
