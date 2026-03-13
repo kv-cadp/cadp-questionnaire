@@ -6,204 +6,7 @@
     <title>Quel alternant pour votre entreprise ? — CADP</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --navy: #141E3C;
-            --navy-light: #1E2D52;
-            --navy-dark: #0D1529;
-            --gold: #C9A84C;
-            --gold-light: #E0C97A;
-            --gold-bg: #F8F3E6;
-            --green: #1B6B3A;
-            --green-light: #E8F5E9;
-            --red: #A63D2F;
-            --red-light: #FFF0ED;
-            --orange: #B8651B;
-            --orange-light: #FFF5EB;
-            --grey-50: #FAFAF9;
-            --grey-100: #F4F3F1;
-            --grey-200: #E8E6E3;
-            --grey-300: #D4D1CC;
-            --grey-500: #8A8680;
-            --grey-700: #4A4744;
-            --grey-900: #1C1B1A;
-            --white: #FFFFFF;
-            --shadow-sm: 0 1px 3px rgba(20,30,60,0.06);
-            --shadow-md: 0 4px 16px rgba(20,30,60,0.08);
-            --shadow-lg: 0 12px 40px rgba(20,30,60,0.12);
-            --radius: 10px;
-            --radius-lg: 16px;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--navy-dark);
-            min-height: 100vh;
-            padding: 20px;
-            color: var(--grey-900);
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 880px;
-            margin: 0 auto;
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-            color: var(--white);
-            padding: 28px 36px;
-            text-align: center;
-        }
-        .header img { height: 56px; margin-bottom: 12px; }
-        .header h1 { font-family: 'DM Serif Display', serif; font-size: 1.5em; margin-bottom: 4px; color: var(--gold); }
-        .header p { font-size: 0.9em; opacity: 0.8; }
-        .progress-wrapper { margin-top: 18px; }
-        .step-indicator {
-            display: flex; justify-content: center; gap: 6px; margin-bottom: 10px;
-            font-size: 0.75em; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
-        }
-        .step-indicator span { opacity: 0.4; }
-        .step-indicator span.active { opacity: 1; color: var(--gold); }
-        .progress-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.4s ease; }
-        .content { padding: 36px; }
-        .section { display: none; animation: fadeIn 0.35s ease; }
-        .section.active { display: block; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-        .section-title { font-family: 'DM Serif Display', serif; font-size: 1.3em; color: var(--navy); margin-bottom: 6px; }
-        .section-description { color: var(--grey-500); margin-bottom: 24px; font-size: 0.9em; }
-        .question { margin-bottom: 24px; }
-        .question-title { font-size: 0.95em; color: var(--grey-900); margin-bottom: 12px; font-weight: 600; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; color: var(--grey-700); font-weight: 600; margin-bottom: 6px; font-size: 0.85em; }
-        .form-group .required { color: var(--gold); }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%; padding: 11px 14px; border: 2px solid var(--grey-200);
-            border-radius: var(--radius); font-size: 0.95em; font-family: inherit;
-            transition: all 0.2s; background: var(--white);
-        }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(20,30,60,0.08);
-        }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        @media (max-width:600px) { .form-row { grid-template-columns: 1fr; } }
-        .options { display: flex; flex-direction: column; gap: 8px; }
-        .option {
-            background: var(--grey-50); padding: 12px 16px; border-radius: var(--radius);
-            cursor: pointer; transition: all 0.2s; border: 2px solid var(--grey-200);
-            display: flex; align-items: flex-start; gap: 10px;
-        }
-        .option:hover { background: var(--grey-100); border-color: var(--grey-300); }
-        .option input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--gold); flex-shrink: 0; margin-top: 3px; pointer-events: none; }
-        .option.selected { background: var(--gold-bg); border-color: var(--gold); }
-        .option label { cursor: pointer; flex: 1; user-select: none; font-size: 0.9em; }
-        .option-title { font-weight: 600; margin-bottom: 1px; }
-        .option-desc { font-size: 0.8em; color: var(--grey-500); }
-        .sector-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        @media (max-width:600px) { .sector-grid { grid-template-columns: 1fr; } }
-        .sector-card {
-            padding: 14px; background: var(--grey-50); border: 2px solid var(--grey-200);
-            border-radius: var(--radius); cursor: pointer; transition: all 0.2s; text-align: center;
-        }
-        .sector-card:hover { border-color: var(--grey-300); background: var(--grey-100); }
-        .sector-card.selected { border-color: var(--gold); background: var(--gold-bg); }
-        .sector-card input { display: none; pointer-events: none; }
-        .sector-card-title { font-weight: 700; color: var(--grey-900); margin-bottom: 2px; font-size: 0.9em; }
-        .sector-card-desc { font-size: 0.75em; color: var(--grey-500); }
-        .navigation { display: flex; justify-content: space-between; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--grey-200); gap: 10px; }
-        .btn {
-            padding: 12px 24px; border: none; border-radius: var(--radius); font-size: 0.9em;
-            font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-        .btn-primary { background: var(--gold); color: var(--navy); }
-        .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: var(--shadow-md); }
-        .btn-secondary { background: var(--grey-200); color: var(--grey-700); }
-        .btn-secondary:hover { background: var(--grey-300); }
-        .btn-success { background: var(--green); color: var(--white); }
-        .btn-success:hover { opacity: 0.9; }
-        .btn-navy { background: var(--navy); color: var(--gold); }
-        .btn-navy:hover { background: var(--navy-light); }
-        .btn svg { width: 16px; height: 16px; }
-        .results { display: none; }
-        .results.active { display: block; animation: fadeIn 0.4s ease; }
-        .results-header { text-align: center; margin-bottom: 28px; }
-        .results-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.4em; color: var(--navy); margin-bottom: 6px; }
-        .result-card {
-            background: var(--grey-50); padding: 20px; border-radius: var(--radius);
-            margin-bottom: 14px; border-left: 5px solid var(--grey-300);
-        }
-        .result-card.rank-1 { border-left-color: var(--green); background: var(--green-light); }
-        .result-card.rank-2 { border-left-color: var(--gold); background: var(--gold-bg); }
-        .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-        .result-rank {
-            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            padding: 3px 10px; border-radius: 4px; color: var(--white);
-        }
-        .result-card.rank-1 .result-rank { background: var(--green); }
-        .result-card.rank-2 .result-rank { background: var(--gold); color: var(--navy); }
-        .result-card .result-rank { background: var(--grey-500); }
-        .result-title { font-family: 'DM Serif Display', serif; font-size: 1.15em; color: var(--navy); margin-bottom: 2px; }
-        .result-subtitle { font-size: 0.8em; color: var(--grey-500); margin-bottom: 10px; }
-        .result-description { color: var(--grey-700); font-size: 0.85em; margin-bottom: 14px; }
-        .result-missions { background: var(--white); padding: 14px; border-radius: var(--radius); }
-        .result-missions h4 { font-size: 0.85em; font-weight: 600; margin-bottom: 8px; }
-        .result-missions ul { margin: 0; padding-left: 16px; color: var(--grey-700); font-size: 0.8em; }
-        .result-missions li { margin-bottom: 4px; }
-        .simulator-section { margin-top: 36px; padding-top: 28px; border-top: 2px solid var(--grey-200); }
-        .simulator-title { font-family: 'DM Serif Display', serif; font-size: 1.2em; color: var(--navy); margin-bottom: 4px; }
-        .simulator-subtitle { color: var(--grey-500); font-size: 0.85em; margin-bottom: 20px; }
-        .simulator-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        @media (max-width:700px) { .simulator-inputs { grid-template-columns: 1fr; } }
-        .simulator-input label { display: block; font-size: 0.8em; font-weight: 600; color: var(--grey-700); margin-bottom: 4px; }
-        .simulator-input select {
-            width: 100%; padding: 10px; border: 2px solid var(--grey-200);
-            border-radius: var(--radius); font-size: 0.9em; font-weight: 600;
-            background: var(--gold-bg); color: var(--navy); cursor: pointer;
-        }
-        .simulator-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        @media (max-width:700px) { .simulator-results { grid-template-columns: 1fr; } }
-        .sim-card { padding: 18px; border-radius: var(--radius); text-align: center; }
-        .sim-card.cdi { background: var(--red-light); border: 2px solid #F5D5CE; }
-        .sim-card.apprenti { background: var(--green-light); border: 2px solid #C8E6C9; }
-        .sim-card.economie { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); color: var(--white); }
-        .sim-card-label { font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; opacity: 0.8; }
-        .sim-card-value { font-size: 1.4em; font-weight: 800; }
-        .sim-card.cdi .sim-card-value { color: var(--red); }
-        .sim-card.apprenti .sim-card-value { color: var(--green); }
-        .sim-card.economie .sim-card-value { color: var(--gold); }
-        .sim-card-sub { font-size: 0.75em; margin-top: 2px; opacity: 0.7; }
-        .sim-details { background: var(--grey-50); border-radius: var(--radius); padding: 18px; margin-top: 14px; }
-        .sim-details-title { font-size: 0.85em; font-weight: 700; margin-bottom: 10px; }
-        .sim-detail-row { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 6px 0; border-bottom: 1px solid var(--grey-200); font-size: 0.85em; }
-        .sim-detail-label { text-align: left; } .sim-detail-cdi { text-align: center; } .sim-detail-apprenti { text-align: center; }
-        .sim-detail-row:last-child { border-bottom: none; font-weight: 700; padding-top: 10px; margin-top: 4px; border-top: 2px solid var(--grey-300); display: grid; grid-template-columns: 1fr 1fr 1fr; }
-        .sim-detail-label { color: var(--grey-700); }
-        .sim-detail-cdi { color: var(--red); font-weight: 600; }
-        .sim-detail-apprenti { color: var(--green); font-weight: 600; }
-        .sim-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; margin: 12px 0; }
-        .sim-badge.young { background: var(--green-light); color: var(--green); }
-        .sim-badge.mid { background: var(--orange-light); color: var(--orange); }
-        .sim-badge.senior { background: var(--gold-bg); color: var(--gold); }
-        .aide-info { background: var(--gold-bg); border: 2px solid var(--gold); border-radius: var(--radius); padding: 14px 18px; margin-top: 16px; font-size: 0.85em; }
-        .aide-info strong { color: var(--navy); }
-        /* Contact overlay */
-        .contact-section { margin-top: 36px; padding-top: 28px; border-top: 2px solid var(--gold); display: none; animation: fadeIn 0.35s ease; }
-        .contact-section.active { display: block; }
-        .action-buttons { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; justify-content: center; }
-        .cta-box {
-            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
-            border-radius: var(--radius-lg); padding: 28px; text-align: center; margin-top: 36px; color: var(--white);
-        }
-        .cta-box h3 { font-family: 'DM Serif Display', serif; color: var(--gold); font-size: 1.2em; margin-bottom: 8px; }
-        .cta-box p { font-size: 0.85em; opacity: 0.8; margin-bottom: 18px; }
-        .cta-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .footer-legal { font-size: 0.7em; color: var(--grey-500); text-align: center; padding: 16px 36px; border-top: 1px solid var(--grey-200); }
-        @media (max-width:768px) { .content { padding: 20px; } .header { padding: 20px; } }
-    </style>
+    <style>:root{--navy:#141E3C;--navy-light:#1E2D52;--navy-dark:#0D1529;--gold:#C9A84C;--gold-light:#E0C97A;--gold-bg:#F8F3E6;--green:#1B6B3A;--green-light:#E8F5E9;--red:#A63D2F;--red-light:#FFF0ED;--orange:#B8651B;--orange-light:#FFF5EB;--grey-50:#FAFAF9;--grey-100:#F4F3F1;--grey-200:#E8E6E3;--grey-300:#D4D1CC;--grey-500:#8A8680;--grey-700:#4A4744;--grey-900:#1C1B1A;--white:#FFFFFF;--shadow-sm:0 1px 3px rgba(20,30,60,0.06);--shadow-md:0 4px 16px rgba(20,30,60,0.08);--shadow-lg:0 12px 40px rgba(20,30,60,0.12);--radius:10px;--radius-lg:16px;}*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'DM Sans',sans-serif;background:var(--navy-dark);min-height:100vh;padding:20px;color:var(--grey-900);line-height:1.6;}.container{max-width:880px;margin:0 auto;background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden;}.header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);color:var(--white);padding:28px 36px;text-align:center;}.header img{height:56px;margin-bottom:12px;}.header h1{font-family:'DM Serif Display',serif;font-size:1.5em;margin-bottom:4px;color:var(--gold);}.header p{font-size:0.9em;opacity:0.8;}.progress-wrapper{margin-top:18px;}.step-indicator{display:flex;justify-content:center;gap:6px;margin-bottom:10px;font-size:0.75em;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;}.step-indicator span{opacity:0.4;}.step-indicator span.active{opacity:1;color:var(--gold);}.progress-bar{width:100%;height:5px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}.progress-fill{height:100%;background:var(--gold);width:0%;transition:width 0.4s ease;}.content{padding:36px;}.section{display:none;animation:fadeIn 0.35s ease;}.section.active{display:block;}@keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}.section-title{font-family:'DM Serif Display',serif;font-size:1.3em;color:var(--navy);margin-bottom:6px;}.section-description{color:var(--grey-500);margin-bottom:24px;font-size:0.9em;}.question{margin-bottom:24px;}.question-title{font-size:0.95em;color:var(--grey-900);margin-bottom:12px;font-weight:600;}.form-group{margin-bottom:18px;}.form-group label{display:block;color:var(--grey-700);font-weight:600;margin-bottom:6px;font-size:0.85em;}.form-group .required{color:var(--gold);}.form-group input,.form-group textarea,.form-group select{width:100%;padding:11px 14px;border:2px solid var(--grey-200);border-radius:var(--radius);font-size:0.95em;font-family:inherit;transition:all 0.2s;background:var(--white);}.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(20,30,60,0.08);}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}@media (max-width:600px){.form-row{grid-template-columns:1fr;}}.options{display:flex;flex-direction:column;gap:8px;}.option{background:var(--grey-50);padding:12px 16px;border-radius:var(--radius);cursor:pointer;transition:all 0.2s;border:2px solid var(--grey-200);display:flex;align-items:flex-start;gap:10px;}.option:hover{background:var(--grey-100);border-color:var(--grey-300);}.option input{width:16px;height:16px;cursor:pointer;accent-color:var(--gold);flex-shrink:0;margin-top:3px;pointer-events:none;}.option.selected{background:var(--gold-bg);border-color:var(--gold);}.option label{cursor:pointer;flex:1;user-select:none;font-size:0.9em;}.option-title{font-weight:600;margin-bottom:1px;}.option-desc{font-size:0.8em;color:var(--grey-500);}.sector-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}@media (max-width:600px){.sector-grid{grid-template-columns:1fr;}}.sector-card{padding:14px;background:var(--grey-50);border:2px solid var(--grey-200);border-radius:var(--radius);cursor:pointer;transition:all 0.2s;text-align:center;}.sector-card:hover{border-color:var(--grey-300);background:var(--grey-100);}.sector-card.selected{border-color:var(--gold);background:var(--gold-bg);}.sector-card input{display:none;pointer-events:none;}.sector-card-title{font-weight:700;color:var(--grey-900);margin-bottom:2px;font-size:0.9em;}.sector-card-desc{font-size:0.75em;color:var(--grey-500);}.navigation{display:flex;justify-content:space-between;margin-top:32px;padding-top:20px;border-top:1px solid var(--grey-200);gap:10px;}.btn{padding:12px 24px;border:none;border-radius:var(--radius);font-size:0.9em;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}.btn-primary{background:var(--gold);color:var(--navy);}.btn-primary:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:var(--shadow-md);}.btn-secondary{background:var(--grey-200);color:var(--grey-700);}.btn-secondary:hover{background:var(--grey-300);}.btn-success{background:var(--green);color:var(--white);}.btn-success:hover{opacity:0.9;}.btn-navy{background:var(--navy);color:var(--gold);}.btn-navy:hover{background:var(--navy-light);}.btn svg{width:16px;height:16px;}.results{display:none;}.results.active{display:block;animation:fadeIn 0.4s ease;}.results-header{text-align:center;margin-bottom:28px;}.results-header h2{font-family:'DM Serif Display',serif;font-size:1.4em;color:var(--navy);margin-bottom:6px;}.result-card{background:var(--grey-50);padding:20px;border-radius:var(--radius);margin-bottom:14px;border-left:5px solid var(--grey-300);}.result-card.rank-1{border-left-color:var(--green);background:var(--green-light);}.result-card.rank-2{border-left-color:var(--gold);background:var(--gold-bg);}.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;}.result-rank{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:3px 10px;border-radius:4px;color:var(--white);}.result-card.rank-1 .result-rank{background:var(--green);}.result-card.rank-2 .result-rank{background:var(--gold);color:var(--navy);}.result-card .result-rank{background:var(--grey-500);}.result-title{font-family:'DM Serif Display',serif;font-size:1.15em;color:var(--navy);margin-bottom:2px;}.result-subtitle{font-size:0.8em;color:var(--grey-500);margin-bottom:10px;}.result-description{color:var(--grey-700);font-size:0.85em;margin-bottom:14px;}.result-missions{background:var(--white);padding:14px;border-radius:var(--radius);}.result-missions h4{font-size:0.85em;font-weight:600;margin-bottom:8px;}.result-missions ul{margin:0;padding-left:16px;color:var(--grey-700);font-size:0.8em;}.result-missions li{margin-bottom:4px;}.simulator-section{margin-top:36px;padding-top:28px;border-top:2px solid var(--grey-200);}.simulator-title{font-family:'DM Serif Display',serif;font-size:1.2em;color:var(--navy);margin-bottom:4px;}.simulator-subtitle{color:var(--grey-500);font-size:0.85em;margin-bottom:20px;}.simulator-inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}@media (max-width:700px){.simulator-inputs{grid-template-columns:1fr;}}.simulator-input label{display:block;font-size:0.8em;font-weight:600;color:var(--grey-700);margin-bottom:4px;}.simulator-input select{width:100%;padding:10px;border:2px solid var(--grey-200);border-radius:var(--radius);font-size:0.9em;font-weight:600;background:var(--gold-bg);color:var(--navy);cursor:pointer;}.simulator-results{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}@media (max-width:700px){.simulator-results{grid-template-columns:1fr;}}.sim-card{padding:18px;border-radius:var(--radius);text-align:center;}.sim-card.cdi{background:var(--red-light);border:2px solid #F5D5CE;}.sim-card.apprenti{background:var(--green-light);border:2px solid #C8E6C9;}.sim-card.economie{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);color:var(--white);}.sim-card-label{font-size:0.75em;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;opacity:0.8;}.sim-card-value{font-size:1.4em;font-weight:800;}.sim-card.cdi .sim-card-value{color:var(--red);}.sim-card.apprenti .sim-card-value{color:var(--green);}.sim-card.economie .sim-card-value{color:var(--gold);}.sim-card-sub{font-size:0.75em;margin-top:2px;opacity:0.7;}.sim-details{background:var(--grey-50);border-radius:var(--radius);padding:18px;margin-top:14px;}.sim-details-title{font-size:0.85em;font-weight:700;margin-bottom:10px;}.sim-detail-row{display:grid;grid-template-columns:1fr 1fr 1fr;padding:6px 0;border-bottom:1px solid var(--grey-200);font-size:0.85em;}.sim-detail-label{text-align:left;}.sim-detail-cdi{text-align:center;}.sim-detail-apprenti{text-align:center;}.sim-detail-row:last-child{border-bottom:none;font-weight:700;padding-top:10px;margin-top:4px;border-top:2px solid var(--grey-300);display:grid;grid-template-columns:1fr 1fr 1fr;}.sim-detail-label{color:var(--grey-700);}.sim-detail-cdi{color:var(--red);font-weight:600;}.sim-detail-apprenti{color:var(--green);font-weight:600;}.sim-badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:0.8em;font-weight:600;margin:12px 0;}.sim-badge.young{background:var(--green-light);color:var(--green);}.sim-badge.mid{background:var(--orange-light);color:var(--orange);}.sim-badge.senior{background:var(--gold-bg);color:var(--gold);}.aide-info{background:var(--gold-bg);border:2px solid var(--gold);border-radius:var(--radius);padding:14px 18px;margin-top:16px;font-size:0.85em;}.aide-info strong{color:var(--navy);}.contact-section{margin-top:36px;padding-top:28px;border-top:2px solid var(--gold);display:none;animation:fadeIn 0.35s ease;}.contact-section.active{display:block;}.action-buttons{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap;justify-content:center;}.cta-box{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);border-radius:var(--radius-lg);padding:28px;text-align:center;margin-top:36px;color:var(--white);}.cta-box h3{font-family:'DM Serif Display',serif;color:var(--gold);font-size:1.2em;margin-bottom:8px;}.cta-box p{font-size:0.85em;opacity:0.8;margin-bottom:18px;}.cta-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}.footer-legal{font-size:0.7em;color:var(--grey-500);text-align:center;padding:16px 36px;border-top:1px solid var(--grey-200);}@media (max-width:768px){.content{padding:20px;}.header{padding:20px;}}</style>
 </head>
 <body>
     <div class="container">
@@ -213,11 +16,11 @@
             <p>3 etapes, 2 minutes — nous identifions le profil ideal pour vos besoins</p>
             <div class="progress-wrapper">
                 <div class="step-indicator" id="stepIndicator">
-                    <span class="active">Etape 1 : Votre activite</span>
+                    <span class="active">Étape 1 : Votre activité</span>
                     <span>|</span>
-                    <span>Etape 2 : Vos missions</span>
+                    <span>Étape 2 : Vos missions</span>
                     <span>|</span>
-                    <span>Etape 3 : Vos criteres</span>
+                    <span>Étape 3 : Vos critères</span>
                 </div>
                 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             </div>
@@ -226,36 +29,59 @@
 
             <!-- ETAPE 1 : Secteur (leger, pas de donnees personnelles) -->
             <div id="section1" class="section active">
-                <h2 class="section-title">Votre activite</h2>
-                <p class="section-description">Commencez par nous dire dans quel environnement l'alternant evoluera.</p>
+                <h2 class="section-title">Votre activité</h2>
+                <p class="section-description">Commencez par nous dire dans quel environnement l'alternant évoluera.</p>
                 <div class="question">
                     <div class="question-title">Dans quel secteur exercez-vous ?</div>
                     <div class="sector-grid">
                         <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="commerce"><div class="sector-card-title">Commerce et Distribution</div><div class="sector-card-desc">Magasins, grandes surfaces, boutiques, e-commerce</div></div>
-                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="medical"><div class="sector-card-title">Sante et Medical</div><div class="sector-card-desc">Cabinets, cliniques, EHPAD, pharmacies</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="medical"><div class="sector-card-title">Santé et Médical</div><div class="sector-card-desc">Cabinets, cliniques, EHPAD, pharmacies</div></div>
                         <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="banque"><div class="sector-card-title">Banque et Assurance</div><div class="sector-card-desc">Agences bancaires, courtage, assurances</div></div>
-                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="services"><div class="sector-card-title">Services a la personne</div><div class="sector-card-desc">Aide a domicile, creches, associations</div></div>
-                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="pme"><div class="sector-card-title">PME / TPE generaliste</div><div class="sector-card-desc">Tous secteurs, artisanat, liberal</div></div>
-                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="industrie"><div class="sector-card-title">Industrie et Production</div><div class="sector-card-desc">Usines, logistique, BTP, nucleaire, energie</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="services"><div class="sector-card-title">Services à la personne</div><div class="sector-card-desc">Aide à domicile, crèches, associations</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="pme"><div class="sector-card-title">PME / TPE généraliste</div><div class="sector-card-desc">Tous secteurs, artisanat, libéral</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="industrie"><div class="sector-card-title">Industrie et Production</div><div class="sector-card-desc">Usines, nucléaire, énergie, chimie</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="btp"><div class="sector-card-title">BTP et Construction</div><div class="sector-card-desc">Bâtiment, travaux publics, immobilier</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="hotellerie"><div class="sector-card-title">Hôtellerie et Restauration</div><div class="sector-card-desc">Hôtels, restaurants, tourisme, événementiel</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="transport"><div class="sector-card-title">Transport et Logistique</div><div class="sector-card-desc">Transport routier, logistique, supply chain</div></div>
+                        <div class="sector-card" onclick="selectSectorCard(this)"><input type="radio" name="secteur" value="agri"><div class="sector-card-title">Agriculture et Agroalimentaire</div><div class="sector-card-desc">Exploitations, coopératives, transformation</div></div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Effectif de votre entreprise</label>
                         <select id="effectif">
-                            <option value="1-10">1 a 10 salaries</option>
-                            <option value="11-49" selected>11 a 49 salaries</option>
-                            <option value="50-249">50 a 249 salaries</option>
-                            <option value="250+">250 salaries et plus</option>
+                            <option value="1-10">1 à 10 salariés</option>
+                            <option value="11-49" selected>11 à 49 salariés</option>
+                            <option value="50-249">50 à 249 salariés</option>
+                            <option value="250+">250 salariés et plus</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Avez-vous deja accueilli un alternant ?</label>
-                        <select id="dejaAlternant">
+                        <label>Avez-vous déjà accueilli un alternant ?</label>
+                        <select id="dejaAlternant" onchange="toggleExperience()">
                             <option value="oui-cadp">Oui, via le CADP</option>
                             <option value="oui-autre">Oui, via un autre CFA</option>
-                            <option value="non" selected>Non, ce serait une premiere</option>
+                            <option value="non" selected>Non, ce serait une première</option>
                         </select>
+                    </div>
+                    <div id="experienceBlock" style="display:none;animation:fadeIn 0.3s ease;">
+                        <div class="form-group">
+                            <label>Comment évaluez-vous cette expérience ?</label>
+                            <select id="experienceNote">
+                                <option value="">Sélectionnez...</option>
+                                <option value="1">1 — Décevante</option>
+                                <option value="2">2 — Mitigée</option>
+                                <option value="3">3 — Satisfaisante</option>
+                                <option value="4">4 — Très satisfaisante</option>
+                                <option value="5">5 — Excellente</option>
+                            </select>
+                        </div>
+                        <div id="experienceDetailBlock" style="display:none;">
+                            <div class="form-group">
+                                <label>Qu'est-ce qui pourrait être amélioré ?</label>
+                                <input type="text" id="experienceDetail" placeholder="Facultatif — vos remarques nous aident à progresser">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="navigation">
@@ -267,106 +93,106 @@
             <!-- ETAPE 2 : Missions -->
             <div id="section2" class="section">
                 <h2 class="section-title">Les missions du poste</h2>
-                <p class="section-description">Ne cherchez pas un diplome — cochez simplement les taches que vous souhaitez confier. Nous trouverons le bon profil pour vous.</p>
+                <p class="section-description">Ne cherchez pas un diplôme — cochez simplement les tâches que vous souhaitez confier. Nous trouverons le bon profil pour vous.</p>
                 <div class="question">
                     <div class="question-title">Missions commerciales</div>
                     <div class="options">
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="vente"><label><div class="option-title">Vente et conseil client</div><div class="option-desc">Accueillir, conseiller, conclure des ventes en face a face ou par telephone</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="prospection"><label><div class="option-title">Prospection et developpement</div><div class="option-desc">Trouver de nouveaux clients, phoning, rendez-vous terrain, partenariats</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="negociation"><label><div class="option-title">Negociation commerciale</div><div class="option-desc">Negocier des contrats, des tarifs, repondre a des appels d'offres</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="digital"><label><div class="option-title">Communication digitale</div><div class="option-desc">Reseaux sociaux, site web, e-commerce, marketing en ligne</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="management"><label><div class="option-title">Management d'equipe</div><div class="option-desc">Animer, organiser, planifier et encadrer une equipe au quotidien</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="vente"><label><div class="option-title">Vente et conseil client</div><div class="option-desc">Accueillir, conseiller, conclure des ventes en face à face ou par téléphone</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="prospection"><label><div class="option-title">Prospection et développement</div><div class="option-desc">Trouver de nouveaux clients, phoning, rendez-vous terrain, partenariats</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="negociation"><label><div class="option-title">Négociation commerciale</div><div class="option-desc">Négocier des contrats, des tarifs, répondre à des appels d'offres</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="digital"><label><div class="option-title">Communication digitale</div><div class="option-desc">Réseaux sociaux, site web, e-commerce, marketing en ligne</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="mc" value="management"><label><div class="option-title">Management d'équipe</div><div class="option-desc">Animer, organiser, planifier et encadrer une équipe au quotidien</div></label></div>
                     </div>
                 </div>
                 <div class="question">
                     <div class="question-title">Missions administratives et gestion</div>
                     <div class="options">
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="accueil"><label><div class="option-title">Accueil et standard</div><div class="option-desc">Accueil physique et telephonique, orientation des visiteurs</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="secretariat"><label><div class="option-title">Secretariat et gestion documentaire</div><div class="option-desc">Redaction, classement, courriers, archivage, organisation</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="compta"><label><div class="option-title">Comptabilite et facturation</div><div class="option-desc">Saisie comptable, factures, relances, tresorerie, declarations fiscales</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="rh"><label><div class="option-title">Gestion RH et paie</div><div class="option-desc">Contrats, plannings, elements de paie, recrutement, formation</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="stock"><label><div class="option-title">Gestion des stocks et approvisionnement</div><div class="option-desc">Commandes fournisseurs, reception, inventaires, logistique</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="accueil"><label><div class="option-title">Accueil et standard</div><div class="option-desc">Accueil physique et téléphonique, orientation des visiteurs</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="secretariat"><label><div class="option-title">Secrétariat et gestion documentaire</div><div class="option-desc">Rédaction, classement, courriers, archivage, organisation</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="compta"><label><div class="option-title">Comptabilité et facturation</div><div class="option-desc">Saisie comptable, factures, relances, trésorerie, déclarations fiscales</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="rh"><label><div class="option-title">Gestion RH et paie</div><div class="option-desc">Contrats, plannings, éléments de paie, recrutement, formation</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ma" value="stock"><label><div class="option-title">Gestion des stocks et approvisionnement</div><div class="option-desc">Commandes fournisseurs, réception, inventaires, logistique</div></label></div>
                     </div>
                 </div>
                 <div class="question">
-                    <div class="question-title">Missions specifiques</div>
+                    <div class="question-title">Missions spécifiques</div>
                     <div class="options">
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="aide_personne"><label><div class="option-title">Accompagnement de personnes</div><div class="option-desc">Aide au quotidien, maintien a domicile, garde d'enfants, repas</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="aide_personne"><label><div class="option-title">Accompagnement de personnes</div><div class="option-desc">Aide au quotidien, maintien à domicile, garde d'enfants, repas</div></label></div>
                         <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="banque"><label><div class="option-title">Conseil bancaire ou assurance</div><div class="option-desc">Produits financiers, credit, patrimoine, contrats d'assurance</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="qhse"><label><div class="option-title">Qualite, Securite, Environnement</div><div class="option-desc">Conformite, prevention des risques, audits, ISO, QHSE</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="rh_dev"><label><div class="option-title">Developpement RH et formation</div><div class="option-desc">GPEC, plan de formation, entretiens pro, marque employeur, QVT</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="qhse"><label><div class="option-title">Qualité, Sécurité, Environnement</div><div class="option-desc">Conformité, prévention des risques, audits, ISO, QHSE</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="ms" value="rh_dev"><label><div class="option-title">Développement RH et formation</div><div class="option-desc">GPEC, plan de formation, entretiens pro, marque employeur, QVT</div></label></div>
                     </div>
                 </div>
                 <div class="navigation">
                     <button class="btn btn-secondary" onclick="previousSection()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path></svg> Retour</button>
-                    <button class="btn btn-primary" onclick="nextSection()">Suivant — vos criteres <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></button>
+                    <button class="btn btn-primary" onclick="nextSection()">Suivant — vos critères <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg></button>
                 </div>
             </div>
 
             <!-- ETAPE 3 : Niveau, conditions, timing -->
             <div id="section3" class="section">
-                <h2 class="section-title">Vos criteres</h2>
-                <p class="section-description">Derniere etape avant vos resultats personnalises.</p>
+                <h2 class="section-title">Vos critères</h2>
+                <p class="section-description">Dernière étape avant vos résultats personnalisés.</p>
                 <div class="question">
-                    <div class="question-title">Quel(s) niveau(x) de formation vous interesserai(en)t ? <span style="font-weight:400;font-size:0.85em;color:#8A8680;">(plusieurs choix possibles)</span></div>
+                    <div class="question-title">Quel(s) niveau(x) de formation vous intéresserai(en)t ? <span style="font-weight:400;font-size:0.85em;color:#8A8680;">(plusieurs choix possibles)</span></div>
                     <div class="options">
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="niveau" value="tp"><label><div class="option-title">Niveau CAP / Bac (Titre professionnel)</div><div class="option-desc">Formation en 12 mois, missions d'execution et d'assistance</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="niveau" value="bts"><label><div class="option-title">Niveau Bac+2 (BTS)</div><div class="option-desc">Formation en 24 mois, technicien superieur polyvalent</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="niveau" value="bachelor"><label><div class="option-title">Niveau Bac+3 (Bachelor)</div><div class="option-desc">Formation en 12 mois, responsabilites et expertise sectorielle</div></label></div>
-                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="niveau" value="indifferent"><label><div class="option-title">Indifferent — conseillez-moi</div><div class="option-desc">Le profil et la motivation comptent plus que le diplome</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="niveau" value="tp"><label><div class="option-title">Niveau CAP / Bac (Titre professionnel)</div><div class="option-desc">Formation en 12 mois, missions d'exécution et d'assistance</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="niveau" value="bts"><label><div class="option-title">Niveau Bac+2 (BTS)</div><div class="option-desc">Formation en 24 mois, technicien supérieur polyvalent</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="niveau" value="bachelor"><label><div class="option-title">Niveau Bac+3 (Bachelor)</div><div class="option-desc">Formation en 12 mois, responsabilités et expertise sectorielle</div></label></div>
+                        <div class="option" onclick="selectMultipleOption(this)"><input type="checkbox" name="niveau" value="indifferent"><label><div class="option-title">Indifférent — conseillez-moi</div><div class="option-desc">Le profil et la motivation comptent plus que le diplôme</div></label></div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="question">
                         <div class="question-title">Quand souhaitez-vous accueillir l'alternant ?</div>
                         <div class="options">
-                            <div class="option" onclick="selectOption(this)"><input type="radio" name="quand" value="sept2026"><label>Rentree septembre 2026</label></div>
-                            <div class="option" onclick="selectOption(this)"><input type="radio" name="quand" value="asap"><label>Des que possible</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="quand" value="sept2026"><label>Rentrée septembre 2026</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="quand" value="asap"><label>Dès que possible</label></div>
                             <div class="option" onclick="selectOption(this)"><input type="radio" name="quand" value="renseigne"><label>Je me renseigne pour plus tard</label></div>
                         </div>
                     </div>
                     <div class="question">
-                        <div class="question-title">Quel rythme preferiez-vous ?</div>
+                        <div class="question-title">Quel rythme préféreriez-vous ?</div>
                         <div class="options">
                             <div class="option" onclick="selectOption(this)"><input type="radio" name="rythme" value="2j3j"><label>2 jours campus / 3 jours entreprise</label></div>
                             <div class="option" onclick="selectOption(this)"><input type="radio" name="rythme" value="1s1s"><label>1 semaine campus / 1 semaine entreprise</label></div>
-                            <div class="option" onclick="selectOption(this)"><input type="radio" name="rythme" value="indiff"><label>Pas de preference</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="rythme" value="indiff"><label>Pas de préférence</label></div>
                         </div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="question">
-                        <div class="question-title">Permis de conduire necessaire ?</div>
+                        <div class="question-title">Permis de conduire nécessaire ?</div>
                         <div class="options">
-                            <div class="option" onclick="selectOption(this)"><input type="radio" name="permis" value="oui"><label>Oui, indispensable</label></div>
-                            <div class="option" onclick="selectOption(this)"><input type="radio" name="permis" value="non"><label>Non ou pas obligatoire</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="permis" value="oui"><label>Oui, avec véhicule indispensable</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="permis" value="non"><label>Non, pas nécessaire</label></div>
                         </div>
                     </div>
                     <div class="question">
                         <div class="question-title">Travail le samedi ?</div>
                         <div class="options">
-                            <div class="option" onclick="selectOption(this)"><input type="radio" name="samedi" value="oui"><label>Oui, regulierement</label></div>
+                            <div class="option" onclick="selectOption(this)"><input type="radio" name="samedi" value="oui"><label>Oui, régulièrement</label></div>
                             <div class="option" onclick="selectOption(this)"><input type="radio" name="samedi" value="non"><label>Non ou exceptionnellement</label></div>
                         </div>
                     </div>
                 </div>
                 <div class="navigation">
                     <button class="btn btn-secondary" onclick="previousSection()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path></svg> Retour</button>
-                    <button class="btn btn-success" onclick="calculateResults()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Voir mes resultats</button>
+                    <button class="btn btn-success" onclick="calculateResults()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Voir mes résultats</button>
                 </div>
             </div>
 
             <!-- RESULTATS -->
             <div id="results" class="results">
                 <div class="results-header">
-                    <h2>Voici les profils recommandes pour votre besoin</h2>
-                    <p>Bases sur les missions que vous avez selectionnees et vos criteres</p>
+                    <h2>Voici les profils recommandés pour votre besoin</h2>
+                    <p>Basés sur les missions que vous avez sélectionnées et vos critères</p>
                 </div>
                 <div id="resultsContainer"></div>
 
                 <!-- Simulateur -->
                 <div class="simulator-section">
-                    <h3 class="simulator-title">Combien coute un alternant ?</h3>
+                    <h3 class="simulator-title">Combien coûte un alternant ?</h3>
                     <p class="simulator-subtitle">Comparaison avec un salarie en CDI au SMIC — base 2026 (12,02 EUR/h) et nouvelles aides (Decret 2026-168)</p>
                     <div class="simulator-inputs">
                         <div class="simulator-input"><label>Age de l'alternant</label>
@@ -391,18 +217,18 @@
                     <div id="simBadge" class="sim-badge mid"></div>
                     <div id="simPresenceInfo" style="font-size:0.85em;color:var(--grey-700);margin-bottom:12px;font-weight:600;text-align:center;"></div>
                     <div class="simulator-results">
-                        <div class="sim-card cdi"><div class="sim-card-label">Cout salarie CDI</div><div class="sim-card-value" id="simCoutCDI">--</div><div class="sim-card-sub" id="simCdiSub">a temps de presence identique</div></div>
-                        <div class="sim-card apprenti"><div class="sim-card-label">Cout alternant</div><div class="sim-card-value" id="simCoutApprenti">--</div><div class="sim-card-sub">aide deduite</div></div>
-                        <div class="sim-card economie"><div class="sim-card-label">Votre economie</div><div class="sim-card-value" id="simEconomie">--</div><div class="sim-card-sub" id="simEconomiePct">--</div></div>
+                        <div class="sim-card cdi"><div class="sim-card-label">Coût salarié CDI</div><div class="sim-card-value" id="simCoutCDI">--</div><div class="sim-card-sub" id="simCdiSub">à temps de présence identique</div></div>
+                        <div class="sim-card apprenti"><div class="sim-card-label">Coût alternant</div><div class="sim-card-value" id="simCoutApprenti">--</div><div class="sim-card-sub">aide déduite</div></div>
+                        <div class="sim-card economie"><div class="sim-card-label">Votre économie</div><div class="sim-card-value" id="simEconomie">--</div><div class="sim-card-sub" id="simEconomiePct">--</div></div>
                     </div>
                     <div class="sim-details">
-                        <div class="sim-details-title">Detail du calcul</div>
-                        <div class="sim-detail-row"><span class="sim-detail-label"></span><span class="sim-detail-cdi" style="font-weight:700;font-size:0.8em;text-transform:uppercase;letter-spacing:0.5px;">Salarie CDI</span><span class="sim-detail-apprenti" style="font-weight:700;font-size:0.8em;text-transform:uppercase;letter-spacing:0.5px;">Alternant</span></div>
+                        <div class="sim-details-title">Détail du calcul</div>
+                        <div class="sim-detail-row"><span class="sim-detail-label"></span><span class="sim-detail-cdi" style="font-weight:700;font-size:0.8em;text-transform:uppercase;letter-spacing:0.5px;">Salarié CDI</span><span class="sim-detail-apprenti" style="font-weight:700;font-size:0.8em;text-transform:uppercase;letter-spacing:0.5px;">Alternant</span></div>
                         <div class="sim-detail-row"><span class="sim-detail-label">Heures en entreprise</span><span class="sim-detail-cdi" id="simHeuresCDI">--</span><span class="sim-detail-apprenti" id="simHeuresApp">--</span></div>
                         <div class="sim-detail-row"><span class="sim-detail-label">Salaire brut</span><span class="sim-detail-cdi" id="simBrutCDI">--</span><span class="sim-detail-apprenti" id="simBrutApprenti">--</span></div>
                         <div class="sim-detail-row"><span class="sim-detail-label">Charges patronales</span><span class="sim-detail-cdi" id="simChargesCDI">--</span><span class="sim-detail-apprenti" id="simChargesApprenti">--</span></div>
-                        <div class="sim-detail-row"><span class="sim-detail-label">Aide employeur (1ere annee)</span><span class="sim-detail-cdi">--</span><span class="sim-detail-apprenti" id="simAide">--</span></div>
-                        <div class="sim-detail-row"><span class="sim-detail-label">Cout total employeur</span><span class="sim-detail-cdi" id="simTotalCDI">--</span><span class="sim-detail-apprenti" id="simTotalApprenti">--</span></div>
+                        <div class="sim-detail-row"><span class="sim-detail-label">Aide employeur (1ère année)</span><span class="sim-detail-cdi">--</span><span class="sim-detail-apprenti" id="simAide">--</span></div>
+                        <div class="sim-detail-row"><span class="sim-detail-label">Coût total employeur</span><span class="sim-detail-cdi" id="simTotalCDI">--</span><span class="sim-detail-apprenti" id="simTotalApprenti">--</span></div>
                     </div>
                     <div class="aide-info" id="aideInfo"></div>
                     <p style="font-size:0.72em;color:var(--grey-500);margin-top:14px;text-align:center;">Calcul indicatif — SMIC au 01/01/2026 (12,02 EUR/h) — Decret n. 2026-168 du 06/03/2026 — Charges estimees (source IFIR).</p>
@@ -410,484 +236,46 @@
 
                 <!-- CTA : contact seulement apres avoir vu les resultats -->
                 <div class="cta-box">
-                    <h3>Interesse(e) ? Passons a l'action.</h3>
-                    <p>Recevez des CV correspondant a votre besoin ou inscrivez-vous a notre prochain Alternance Dating.</p>
+                    <h3>Intéressé(e) ? Passons à l'action.</h3>
+                    <p>Recevez des CV correspondant à votre besoin ou inscrivez-vous a notre prochain Alternance Dating.</p>
                     <div class="cta-buttons">
-                        <button class="btn btn-primary" onclick="showContact()">Je souhaite etre recontacte(e)</button>
-                        <button class="btn btn-secondary" onclick="exportPDF()" style="background:var(--white);color:var(--navy);">Telecharger le PDF</button>
+                        <button class="btn btn-primary" onclick="showContact()">Je souhaite être recontacté(e)</button>
+                        <button class="btn btn-secondary" onclick="exportPDF()" style="background:var(--white);color:var(--navy);">Télécharger le PDF</button>
                         <button class="btn btn-secondary" onclick="restartQuiz()" style="background:rgba(255,255,255,0.15);color:var(--white);">Recommencer</button>
                     </div>
                 </div>
 
                 <!-- Formulaire de contact (cache, revele au clic) -->
                 <div id="contactSection" class="contact-section">
-                    <h2 class="section-title">Vos coordonnees</h2>
-                    <p class="section-description">Pour que nous puissions vous recontacter et vous envoyer des profils adaptes.</p>
+                    <h2 class="section-title">Vos coordonnées</h2>
+                    <p class="section-description">Pour que nous puissions vous recontacter et vous envoyer des profils adaptés.</p>
                     <div class="form-row">
                         <div class="form-group"><label>Nom de l'entreprise <span class="required">*</span></label><input type="text" id="entreprise" placeholder="Raison sociale"></div>
                         <div class="form-group"><label>SIRET</label><input type="text" id="siret" placeholder="14 chiffres (facultatif)"></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" id="nom" placeholder="Votre nom"></div>
-                        <div class="form-group"><label>Prenom <span class="required">*</span></label><input type="text" id="prenom" placeholder="Votre prenom"></div>
+                        <div class="form-group"><label>Prenom <span class="required">*</span></label><input type="text" id="prenom" placeholder="Votre prénom"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label>Fonction</label><input type="text" id="fonction" placeholder="Ex: Gerant, DRH..."></div>
+                        <div class="form-group"><label>Fonction</label><input type="text" id="fonction" placeholder="Ex : Gérant, DRH..."></div>
                         <div class="form-group"><label>Telephone <span class="required">*</span></label><input type="tel" id="telephone" placeholder="06 12 34 56 78"></div>
                     </div>
                     <div class="form-group"><label>Email <span class="required">*</span></label><input type="email" id="email" placeholder="votre@email.com"></div>
-                    <div class="form-group"><label>Un commentaire ? Une precision sur votre besoin ?</label><textarea id="commentaire" rows="3" placeholder="Facultatif — dites-nous ce qui est important pour vous"></textarea></div>
+                    <div class="form-group"><label>Un commentaire ? Une précision sur votre besoin ?</label><textarea id="commentaire" rows="3" placeholder="Facultatif — dites-nous ce qui est important pour vous"></textarea></div>
                     <div style="text-align:center;margin-top:20px;">
                         <button class="btn btn-success" onclick="sendEmail()" style="font-size:1em;padding:14px 36px;">Envoyer ma demande au CADP</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="footer-legal">(c) CADP 2026 — Campus Alternance Drome Provence — UFA du CFA IFIR Lyon<br>2 bd Frederic Mistral, 26700 Pierrelatte — Donnees indicatives, non contractuelles.</div>
+        <div class="footer-legal">(c) CADP 2026 — Campus Alternance Drôme Provence — UFA du CFA IFIR Lyon<br>2 bd Frederic Mistral, 26700 Pierrelatte — Données indicatives, non contractuelles.</div>
     </div>
 
     <script src="config.js"></script>
     <script>
-    let currentSection = 1;
-    const totalSections = 3;
-    const stepLabels = [
-        ['Etape 1 : Votre activite', 'Etape 2 : Vos missions', 'Etape 3 : Vos criteres'],
-    ];
-
-    const formations = {
-        gpme: { name:"BTS GPME", full:"Gestion de la PME", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
-            desc:"Profil polyvalent : bras droit du dirigeant. Administration, gestion, RH, relation clients et fournisseurs.",
-            missions:["Gerer la relation clients et fournisseurs","Assurer le suivi comptable et financier","Participer a la gestion RH (contrats, paie, planning)","Contribuer au developpement commercial","Organiser et planifier les activites de la PME"], p:0 },
-        ndrc: { name:"BTS NDRC", full:"Negociation et Digitalisation de la Relation Client", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
-            desc:"Profil commercial terrain avec forte dimension digitale. Prospection, negociation, fidelisation.",
-            missions:["Prospecter et developper le portefeuille clients","Negocier et conclure des ventes","Animer la relation client digitale (reseaux, e-commerce)","Fideliser et developper les partenariats","Analyser les performances commerciales"], p:0 },
-        mco: { name:"BTS MCO", full:"Management Commercial Operationnel", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
-            desc:"Profil manager de point de vente. Animation d'equipe, gestion de rayon, pilotage des resultats.",
-            missions:["Accueillir, conseiller et vendre","Manager et animer l'equipe commerciale","Gerer et mettre en valeur l'offre produits","Analyser les indicateurs de performance","Organiser les operations commerciales"], p:0 },
-        cg: { name:"BTS CG", full:"Comptabilite et Gestion", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
-            desc:"Profil comptable et gestionnaire. Saisie, declarations fiscales, controle de gestion, outils numeriques.",
-            missions:["Realiser les operations comptables courantes","Etablir et controler les declarations fiscales","Produire les etats financiers","Assurer le suivi de tresorerie","Participer au controle de gestion"], p:0 },
-        mos: { name:"BTS MOS", full:"Management Operationnel de la Securite", niveau:"Bac+2", nc:5, duree:"24 mois", dm:24,
-            desc:"Profil responsable securite et surete. Management d'equipe, gestion des risques, conformite reglementaire.",
-            missions:["Manager les equipes de securite","Piloter la qualite et la conformite","Gerer les ressources humaines et le materiel","Assurer la relation client et les reporting","Analyser les risques et ameliorer les processus"], p:0 },
-        advf: { name:"TP ADVF", full:"Assistant(e) De Vie aux Familles", niveau:"Niveau 3 (CAP)", nc:3, duree:"12 mois", dm:12,
-            desc:"Profil aide a domicile. Accompagnement des personnes fragiles, garde d'enfants, entretien du cadre de vie.",
-            missions:["Accompagner les personnes dans les actes du quotidien","Aider au maintien a domicile","Assurer la garde et l'eveil des enfants","Entretenir le domicile","Preparer les repas"], p:0 },
-        amum: { name:"TP AMUM", full:"Assistant Manager d'Unite Marchande", niveau:"Niveau 4 (Bac)", nc:4, duree:"12 mois", dm:12,
-            desc:"Profil adjoint de responsable en commerce. Gestion de rayon, stocks, animation d'equipe.",
-            missions:["Gerer l'approvisionnement et les stocks","Participer au merchandising","Animer et coordonner l'equipe de vente","Contribuer a l'atteinte des objectifs","Suivre les indicateurs de performance"], p:0 },
-        bachelor_qhse: { name:"Bachelor QHSE", full:"Qualite Hygiene Securite Environnement", niveau:"Bac+3", nc:6, duree:"12 mois", dm:12,
-            desc:"Profil responsable prevention et conformite. Systeme qualite, audits internes, securite, environnement.",
-            missions:["Mettre en place le systeme qualite","Animer la prevention des risques","Realiser les audits internes","Former le personnel","Assurer la veille reglementaire"], p:0 },
-        bachelor_banque: { name:"Bachelor Banque Assurance", full:"Charge(e) de Clientele Banque Assurance", niveau:"Bac+3", nc:6, duree:"12 mois", dm:12,
-            desc:"Profil conseiller expert en produits financiers et assurantiels. Gestion de portefeuille.",
-            missions:["Conseiller sur les produits bancaires","Proposer des solutions d'assurance","Analyser les besoins patrimoniaux","Developper et fideliser un portefeuille","Suivre les dossiers de credit"], p:0 },
-        bachelor_rh: { name:"Bachelor CDRH", full:"Charge(e) de Developpement des Ressources Humaines", niveau:"Bac+3", nc:6, duree:"12 mois", dm:12,
-            desc:"Profil RH operationnel. Recrutement, formation, GPEC, marque employeur, droit social.",
-            missions:["Piloter le recrutement","Elaborer le plan de formation","Gerer les entretiens pro et la GPEC","Contribuer a la marque employeur","Assurer la veille en droit social"], p:0 },
-    };
-
-    function getAide(nc, effectif, rqth) {
-        if (rqth) return 6000;
-        const grand = effectif === '250+';
-        if (!grand) { if (nc<=4) return 6000; if (nc===5) return 4500; return 2000; }
-        else { if (nc<=4) return 2000; if (nc===5) return 1500; return 750; }
-    }
-
-    const SMIC_H=12.02, SMIC_M=1823.03, H_AN=1820;
-
-    function updateUI() {
-        document.getElementById('progressFill').style.width = (currentSection/totalSections*100)+'%';
-        const spans = document.querySelectorAll('#stepIndicator span');
-        const stepIdx = [0,2,4];
-        spans.forEach((s,i) => s.classList.remove('active'));
-        if (currentSection <= 3) { spans[stepIdx[currentSection-1]].classList.add('active'); }
-    }
-
-    function nextSection() {
-        if (currentSection < totalSections) {
-            document.getElementById('section'+currentSection).classList.remove('active');
-            currentSection++;
-            document.getElementById('section'+currentSection).classList.add('active');
-            updateUI(); window.scrollTo(0,0);
-        }
-    }
-    function previousSection() {
-        if (currentSection > 1) {
-            document.getElementById('section'+currentSection).classList.remove('active');
-            currentSection--;
-            document.getElementById('section'+currentSection).classList.add('active');
-            updateUI(); window.scrollTo(0,0);
-        }
-    }
-
-    function selectOption(el) {
-        const inp=el.querySelector('input'), name=inp.name;
-        document.querySelectorAll('input[name="'+name+'"]').forEach(o => o.closest('.option').classList.remove('selected'));
-        inp.checked=true; el.classList.add('selected');
-    }
-    function selectSectorCard(el) {
-        const inp=el.querySelector('input'), name=inp.name;
-        document.querySelectorAll('input[name="'+name+'"]').forEach(o => o.closest('.sector-card').classList.remove('selected'));
-        inp.checked=true; el.classList.add('selected');
-    }
-    function selectMultipleOption(el) {
-        const inp=el.querySelector('input'); inp.checked=!inp.checked; el.classList.toggle('selected',inp.checked);
-    }
-
-    function calculateResults() {
-        Object.keys(formations).forEach(k => formations[k].p=0);
-        const secteur = document.querySelector('input[name="secteur"]:checked');
-        if (secteur) {
-            const v=secteur.value;
-            if (v==='commerce') { formations.mco.p+=40; formations.amum.p+=35; formations.ndrc.p+=25; }
-            else if (v==='medical') { formations.advf.p+=50; }
-            else if (v==='banque') { formations.bachelor_banque.p+=55; formations.ndrc.p+=10; }
-            else if (v==='services') { formations.advf.p+=50; formations.mos.p+=15; formations.bachelor_rh.p+=10; }
-            else if (v==='pme') { formations.gpme.p+=45; formations.cg.p+=25; formations.bachelor_rh.p+=15; }
-            else if (v==='industrie') { formations.bachelor_qhse.p+=45; formations.mos.p+=30; formations.gpme.p+=15; }
-        }
-        document.querySelectorAll('input[name="mc"]:checked').forEach(i => {
-            const v=i.value;
-            if (v==='vente') { formations.mco.p+=30; formations.amum.p+=20; formations.ndrc.p+=20; formations.bachelor_banque.p+=10; }
-            else if (v==='prospection') { formations.ndrc.p+=40; formations.bachelor_banque.p+=15; }
-            else if (v==='negociation') { formations.ndrc.p+=35; formations.bachelor_banque.p+=20; }
-            else if (v==='digital') { formations.ndrc.p+=30; formations.mco.p+=10; }
-            else if (v==='management') { formations.mco.p+=35; formations.amum.p+=25; formations.mos.p+=30; }
-        });
-        document.querySelectorAll('input[name="ma"]:checked').forEach(i => {
-            const v=i.value;
-            if (v==='accueil') { formations.gpme.p+=25; }
-            else if (v==='secretariat') { formations.gpme.p+=30; }
-            else if (v==='compta') { formations.cg.p+=50; formations.gpme.p+=15; }
-            else if (v==='rh') { formations.gpme.p+=25; formations.bachelor_rh.p+=45; }
-            else if (v==='stock') { formations.amum.p+=35; formations.mco.p+=20; }
-        });
-        document.querySelectorAll('input[name="ms"]:checked').forEach(i => {
-            const v=i.value;
-            if (v==='aide_personne') formations.advf.p+=55;
-            else if (v==='banque') formations.bachelor_banque.p+=55;
-            else if (v==='qhse') { formations.bachelor_qhse.p+=55; formations.mos.p+=10; }
-            else if (v==='rh_dev') { formations.bachelor_rh.p+=55; formations.gpme.p+=5; }
-        });
-        document.querySelectorAll('input[name="niveau"]:checked').forEach(function(niveau) {
-            const v=niveau.value;
-            if (v==='tp') { formations.advf.p+=20; formations.amum.p+=20; }
-            else if (v==='bts') { Object.keys(formations).forEach(k=>{if(formations[k].nc===5)formations[k].p+=12;}); }
-            else if (v==='bachelor') { Object.keys(formations).forEach(k=>{if(formations[k].nc===6)formations[k].p+=15;}); }
-            else if (v==='indifferent') { Object.keys(formations).forEach(k=>{formations[k].p+=5;}); }
-        });
-        const permis=document.querySelector('input[name="permis"]:checked');
-        if (permis && permis.value==='oui') { formations.ndrc.p+=5; formations.advf.p+=5; }
-        const samedi=document.querySelector('input[name="samedi"]:checked');
-        if (samedi && samedi.value==='oui') { formations.mco.p+=10; formations.amum.p+=10; }
-
-        displayResults();
-    }
-
-    function displayResults() {
-        const eff = document.getElementById('effectif').value;
-        const sorted = Object.entries(formations).sort((a,b)=>b[1].p-a[1].p).filter(f=>f[1].p>0);
-        const container = document.getElementById('resultsContainer');
-        container.innerHTML = '';
-        const maxPts = sorted.length > 0 ? sorted[0][1].p : 1;
-
-        sorted.slice(0,3).forEach(([key,data],i) => {
-            const rc = i<2?'rank-'+(i+1):'';
-            const rt = i===0?'Meilleure correspondance':i===1?'Tres adapte':'Adapte';
-            const pct = Math.round(data.p/maxPts*100);
-            const aide = getAide(data.nc, eff, false);
-            container.innerHTML += '<div class="result-card '+rc+'"><div class="result-header"><span class="result-rank">'+rt+' ('+pct+'%)</span></div>'+
-                '<h3 class="result-title">'+data.name+'</h3><p class="result-subtitle">'+data.full+' — '+data.niveau+' — '+data.duree+' — Aide employeur : '+aide.toLocaleString('fr-FR')+' EUR</p>'+
-                '<p class="result-description">'+data.desc+'</p><div class="result-missions"><h4>Missions confiables a ce profil :</h4><ul>'+
-                data.missions.map(m=>'<li>'+m+'</li>').join('')+'</ul></div></div>';
-        });
-
-        if (sorted.length>0) {
-            const top=sorted[0][1];
-            const sim=document.getElementById('simFormation');
-            if (top.nc<=4) sim.value='tp-12'; else if (top.nc===5) sim.value='bts-24'; else sim.value='bachelor-12';
-        }
-
-        document.getElementById('section'+currentSection).classList.remove('active');
-        document.getElementById('results').classList.add('active');
-        // Update step indicator to show "Resultats"
-        document.querySelectorAll('#stepIndicator span').forEach(s=>s.classList.remove('active'));
-        document.getElementById('progressFill').style.width='100%';
-        updateSimulator();
-        window.scrollTo(0,0);
-    }
-
-    function showContact() {
-        document.getElementById('contactSection').classList.add('active');
-        document.getElementById('contactSection').scrollIntoView({behavior:'smooth'});
-    }
-
-    function updateSimulator() {
-        const age=parseInt(document.getElementById('simAge').value);
-        const [type,dureeStr]=document.getElementById('simFormation').value.split('-');
-        const duree=parseInt(dureeStr);
-        const rqth=document.getElementById('simHandicap').value==='oui';
-        const eff=document.getElementById('effectif').value;
-
-        let tranche,taux,bc,nc;
-        if (age<18){tranche='16-17 ans';taux=0.27;bc='young';}
-        else if (age<21){tranche='18-20 ans';taux=0.43;bc='young';}
-        else if (age<26){tranche='21-25 ans';taux=0.53;bc='mid';}
-        else{tranche='26 ans et +';taux=1.00;bc='senior';}
-
-        if (type==='tp') nc=4; else if (type==='bts') nc=5; else nc=6;
-        const aide=getAide(nc,eff,rqth);
-        const chTaux = (eff==='250+'||eff==='50-249') ? 0.077 : 0.016;
-
-        const hFormAn = type==='bts'?675:(type==='bachelor'?600:450);
-        const hEnt = (H_AN-hFormAn)*(duree/12);
-        const brutCDI = SMIC_H*hEnt;
-        const chargesCDI = brutCDI*0.25;
-        const coutCDI = brutCDI+chargesCDI;
-        const brutMens = SMIC_M*taux;
-        const brutApp = brutMens*duree;
-        const chargesApp = brutApp*chTaux;
-        const coutBrut = brutApp+chargesApp;
-        const coutNet = coutBrut-aide;
-        const eco = coutCDI-coutNet;
-        const ecoPct = coutCDI>0?(eco/coutCDI*100):0;
-
-        const badge=document.getElementById('simBadge');
-        badge.textContent=tranche+' : '+Math.round(taux*100)+'% du SMIC ('+Math.round(brutMens)+' EUR brut/mois)';
-        badge.className='sim-badge '+bc;
-
-        document.getElementById('simCoutCDI').textContent=fmt(coutCDI);
-        document.getElementById('simCoutApprenti').textContent=fmt(coutNet);
-        document.getElementById('simEconomie').textContent=fmt(eco);
-        document.getElementById('simEconomiePct').textContent='soit '+Math.round(ecoPct)+'% d\'economie';
-        document.getElementById('simBrutCDI').textContent=fmt(brutCDI);
-        document.getElementById('simBrutApprenti').textContent=fmt(brutApp);
-        document.getElementById('simChargesCDI').textContent=fmt(chargesCDI);
-        document.getElementById('simChargesApprenti').textContent=fmt(chargesApp);
-        document.getElementById('simAide').textContent='- '+fmt(aide);
-        document.getElementById('simTotalCDI').textContent=fmt(coutCDI);
-        document.getElementById('simTotalApprenti').textContent=fmt(coutNet);
-
-        // Presence info
-        var hFormAnnuel = Math.round(hFormAn);
-        var hEntTot = Math.round(hEnt);
-        document.getElementById('simPresenceInfo').textContent='Comparaison a temps de presence identique : '+hEntTot+'h en entreprise sur '+duree+' mois (base '+H_AN+'h/an dont '+hFormAnnuel+'h/an en formation)';
-        document.getElementById('simCdiSub').textContent='pour '+hEntTot+'h de presence';
-        document.getElementById('simHeuresCDI').textContent=hEntTot+'h';
-        document.getElementById('simHeuresApp').textContent=hEntTot+'h';
-
-        const grand=eff==='250+';
-        let at='<strong>Aide applicable : '+aide.toLocaleString('fr-FR')+' EUR</strong> (1ere annee)<br>';
-        if (rqth) at+='Majoration RQTH : 6 000 EUR quel que soit le niveau de formation.';
-        else if (!grand&&nc<=4) at+='Aide unique a l\'apprentissage — entreprise de moins de 250 salaries, niveau CAP/Bac.';
-        else if (!grand&&nc===5) at+='Aide exceptionnelle (decret 2026-168) — moins de 250 salaries, niveau BTS.';
-        else if (!grand&&nc>=6) at+='Aide exceptionnelle (decret 2026-168) — moins de 250 salaries, niveau Bachelor.';
-        else at+='Aide exceptionnelle (decret 2026-168) — entreprise de 250 salaries et plus.';
-        at+='<br>Contrats conclus avant le 1er janvier 2027. Versement mensuel la 1ere annee.';
-        document.getElementById('aideInfo').innerHTML=at;
-    }
-
-    function fmt(n){return Math.round(n).toLocaleString('fr-FR')+' EUR';}
-
-    function getFormData() {
-        return {
-            entreprise: document.getElementById('entreprise').value.trim(),
-            nom: document.getElementById('nom').value.trim(),
-            prenom: document.getElementById('prenom').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            telephone: document.getElementById('telephone').value.trim(),
-            fonction: document.getElementById('fonction').value.trim(),
-            commentaire: document.getElementById('commentaire').value.trim(),
-        };
-    }
-
-    function exportPDF() {
-        const fd = getFormData();
-        const {jsPDF}=window.jspdf;
-        const doc=new jsPDF();
-        let y=20;const pw=doc.internal.pageSize.width,m=20;
-
-        doc.setFontSize(14);doc.setTextColor(20,30,60);doc.setFont("helvetica","bold");
-        doc.text("CADP — Recommandation de formation en alternance",pw/2,y,{align:"center"});y+=12;
-
-        if (fd.entreprise) {
-            doc.setFontSize(9);doc.setFont("helvetica","normal");doc.setTextColor(50,50,50);
-            doc.text('Entreprise : '+fd.entreprise,m,y);y+=5;
-            if(fd.nom)doc.text('Contact : '+fd.prenom+' '+fd.nom+(fd.fonction?' — '+fd.fonction:''),m,y);y+=5;
-            if(fd.email)doc.text('Email : '+fd.email+(fd.telephone?' | Tel : '+fd.telephone:''),m,y);y+=10;
-        }
-
-        doc.setFontSize(11);doc.setFont("helvetica","bold");doc.setTextColor(20,30,60);
-        doc.text("Formations recommandees",m,y);y+=8;
-
-        const eff=document.getElementById('effectif').value;
-        const sorted=Object.entries(formations).sort((a,b)=>b[1].p-a[1].p).filter(f=>f[1].p>0).slice(0,3);
-        doc.setFontSize(9);
-        sorted.forEach((f,i)=>{
-            const d=f[1],aide=getAide(d.nc,eff,false);
-            doc.setFont("helvetica","bold");doc.setTextColor(i===0?[27,107,58]:[100,100,100]);
-            doc.text((i+1)+'. '+d.name+' — '+d.full,m,y);y+=5;
-            doc.setFont("helvetica","normal");doc.setTextColor(100,100,100);
-            doc.text('   '+d.niveau+' | '+d.duree+' | Aide : '+aide.toLocaleString('fr-FR')+' EUR',m,y);y+=7;
-        });
-        y+=3;
-        doc.setFontSize(11);doc.setFont("helvetica","bold");doc.setTextColor(20,30,60);
-        doc.text("Simulation de cout",m,y);y+=7;
-        doc.setFontSize(9);doc.setFont("helvetica","normal");
-        doc.text('Cout CDI equivalent : '+document.getElementById('simCoutCDI').textContent,m,y);y+=5;
-        doc.text('Cout alternant (aide deduite) : '+document.getElementById('simCoutApprenti').textContent,m,y);y+=5;
-        doc.setFont("helvetica","bold");doc.setTextColor(27,107,58);
-        doc.text('Economie : '+document.getElementById('simEconomie').textContent+' ('+document.getElementById('simEconomiePct').textContent+')',m,y);
-
-        doc.setFontSize(7);doc.setTextColor(150,150,150);
-        doc.text("CADP — Campus Alternance Drome Provence — 2 bd Frederic Mistral, 26700 Pierrelatte — (c) 2026",pw/2,doc.internal.pageSize.height-10,{align:"center"});
-
-        const filename = fd.entreprise ? 'Recommandation_'+fd.entreprise+'.pdf' : 'Recommandation_CADP.pdf';
-        doc.save(filename);
-    }
-
-    // ===== CONFIGURATION =====
-    // Cette URL sera remplacee automatiquement via le panneau ?config
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_2OXPJpqF30VUr8nBdy3k-oiAgcLX1YbDxMOD8VbZ4iKFTtzsAGKEs1K7actvRktKrw/exec';
-
-    // Panneau de configuration (accessible via ?config dans l'URL)
-    if (window.location.search.indexOf('config') !== -1) {
-        document.querySelector('.container').innerHTML =
-        '<div style="padding:48px;max-width:600px;margin:0 auto;">'
-        +'<div style="text-align:center;margin-bottom:32px;">'
-        +'<h1 style="font-family:DM Serif Display,serif;color:#141E3C;font-size:1.6em;margin-bottom:8px;">Configuration du questionnaire</h1>'
-        +'<p style="color:#8A8680;font-size:0.9em;">Cette page n\'est visible que par vous (via ?config dans l\'URL).</p>'
-        +'</div>'
-
-        +'<div style="background:#F8F3E6;border:2px solid #C9A84C;border-radius:10px;padding:24px;margin-bottom:24px;">'
-        +'<h3 style="color:#141E3C;margin-bottom:12px;font-size:1em;">Etape 1 — Collez votre URL Google Apps Script</h3>'
-        +'<p style="color:#4A4744;font-size:0.85em;margin-bottom:12px;">C\'est l\'URL que Google vous a donnee quand vous avez deploye le script (elle commence par https://script.google.com/macros/...)</p>'
-        +'<input id="configUrl" type="text" placeholder="https://script.google.com/macros/s/AKfycb.../exec" style="width:100%;padding:12px;border:2px solid #E8E6E3;border-radius:8px;font-size:0.9em;font-family:inherit;margin-bottom:8px;">'
-        +'<p id="configStatus" style="font-size:0.8em;color:#8A8680;"></p>'
-        +'</div>'
-
-        +'<div style="background:#E8F5E9;border:2px solid #C8E6C9;border-radius:10px;padding:24px;margin-bottom:24px;">'
-        +'<h3 style="color:#1B6B3A;margin-bottom:12px;font-size:1em;">Etape 2 — Generez votre fichier</h3>'
-        +'<p style="color:#4A4744;font-size:0.85em;margin-bottom:16px;">Cliquez sur le bouton ci-dessous. Vous obtiendrez un fichier index.html pret a deployer sur GitHub Pages, avec votre URL integree.</p>'
-        +'<button id="configBtn" onclick="generateConfiguredFile()" style="background:#1B6B3A;color:white;border:none;padding:14px 28px;border-radius:8px;font-size:0.95em;font-weight:600;cursor:pointer;font-family:inherit;width:100%;">Generer mon fichier index.html</button>'
-        +'</div>'
-
-        +'<div style="background:#F4F3F1;border-radius:10px;padding:24px;">'
-        +'<h3 style="color:#141E3C;margin-bottom:12px;font-size:1em;">Etape 3 — Uploadez sur GitHub</h3>'
-        +'<p style="color:#4A4744;font-size:0.85em;">Allez sur votre depot GitHub > Add file > Upload files > deposez le fichier telecharge > Commit changes. Votre site sera mis a jour en 1-2 minutes.</p>'
-        +'</div>'
-
-        +'<div style="text-align:center;margin-top:24px;">'
-        +'<a href="?" style="color:#C9A84C;font-size:0.85em;">Voir le questionnaire tel que les entreprises le voient</a>'
-        +'</div>'
-        +'</div>';
-    }
-
-    function generateConfiguredFile() {
-        var url = document.getElementById('configUrl').value.trim();
-        if (!url || !url.startsWith('https://script.google.com/')) {
-            document.getElementById('configStatus').textContent = 'L\'URL doit commencer par https://script.google.com/macros/...';
-            document.getElementById('configStatus').style.color = '#A63D2F';
-            return;
-        }
-        document.getElementById('configStatus').textContent = 'URL valide.';
-        document.getElementById('configStatus').style.color = '#1B6B3A';
-
-        // Recuperer le code source complet de cette page
-        var fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-        // Remplacer le placeholder par la vraie URL
-        fullHtml = fullHtml.replace("const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_2OXPJpqF30VUr8nBdy3k-oiAgcLX1YbDxMOD8VbZ4iKFTtzsAGKEs1K7actvRktKrw/exec'", "const SCRIPT_URL = '" + url + "'");
-        // Retirer le panneau de config du fichier genere (il ne doit pas apparaitre pour les visiteurs)
-        // On ne le retire pas - il n'apparait que si ?config est dans l'URL, donc pas de souci
-
-        // Telecharger
-        var blob = new Blob([fullHtml], {type:'text/html'});
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'index.html';
-        a.click();
-
-        document.getElementById('configBtn').textContent = 'Fichier telecharge !';
-        document.getElementById('configBtn').style.background = '#C9A84C';
-    }
-
-    function sendEmail() {
-        const fd=getFormData();
-        if (!fd.entreprise||!fd.nom||!fd.email||!fd.telephone) { alert('Merci de remplir au minimum : entreprise, nom, email et telephone.'); return; }
-
-        const eff=document.getElementById('effectif').value;
-        const deja=document.getElementById('dejaAlternant').value;
-        const sorted=Object.entries(formations).sort((a,b)=>b[1].p-a[1].p).filter(f=>f[1].p>0).slice(0,3);
-        const secteur=document.querySelector('input[name="secteur"]:checked');
-        const quand=document.querySelector('input[name="quand"]:checked');
-        const rythme=document.querySelector('input[name="rythme"]:checked');
-
-        const payload = {
-            entreprise: fd.entreprise, nom: fd.nom, prenom: fd.prenom,
-            fonction: fd.fonction, email: fd.email, telephone: fd.telephone,
-            effectif: eff,
-            dejaAlternant: deja==='oui-cadp'?'Oui (CADP)':deja==='oui-autre'?'Oui (autre CFA)':'Non',
-            secteur: secteur?secteur.value:'',
-            quand: quand?(quand.value==='sept2026'?'Septembre 2026':quand.value==='asap'?'Des que possible':'Se renseigne'):'',
-            rythme: rythme?(rythme.value==='2j3j'?'2j campus / 3j entreprise':rythme.value==='1s1s'?'1 sem / 1 sem':'Indifferent'):'',
-            formation1: sorted[0]?sorted[0][1].name+' — '+sorted[0][1].full:'',
-            formation2: sorted[1]?sorted[1][1].name+' — '+sorted[1][1].full:'',
-            formation3: sorted[2]?sorted[2][1].name+' — '+sorted[2][1].full:'',
-            economie: document.getElementById('simEconomie').textContent,
-            aide: document.getElementById('simAide').textContent.replace('- ',''),
-            commentaire: fd.commentaire
-        };
-
-        var btn = document.querySelector('#contactSection .btn-success');
-        var originalText = btn.textContent;
-
-        // Si le script Google n'est pas encore configure, fallback mailto
-        if (SCRIPT_URL === 'PAS_ENCORE_CONFIGURE') {
-            var subject='Demande alternance — '+fd.entreprise;
-            var body='ENTREPRISE : '+fd.entreprise+'\nCONTACT : '+fd.prenom+' '+fd.nom+'\nFONCTION : '+(fd.fonction||'-')+'\nEMAIL : '+fd.email+'\nTEL : '+fd.telephone+'\nEFFECTIF : '+eff+'\nECHEANCE : '+(payload.quand||'-')+'\nRYTHME : '+(payload.rythme||'-')+'\n\nFORMATIONS :\n1. '+payload.formation1+'\n2. '+payload.formation2+(payload.formation3?'\n3. '+payload.formation3:'')+'\n\nECONOMIE : '+payload.economie+'\nAIDE : '+payload.aide+(fd.commentaire?'\n\nCOMMENTAIRE : '+fd.commentaire:'')+'\n\nCordialement,\n'+fd.prenom+' '+fd.nom;
-            window.location.href='mailto:contact@cadp.pro?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
-            return;
-        }
-
-        // Envoi vers Google Sheets
-        btn.textContent = 'Envoi en cours...';
-        btn.disabled = true;
-
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(payload)
-        }).then(function() {
-            document.getElementById('contactSection').innerHTML =
-                '<div style="text-align:center;padding:40px 20px;">'
-                +'<div style="width:60px;height:60px;border-radius:50%;background:#E8F5E9;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;"><svg width="28" height="28" fill="none" stroke="#1B6B3A" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>'
-                +'<h2 style="font-family:DM Serif Display,serif;color:#141E3C;margin-bottom:12px;">Demande bien recue !</h2>'
-                +'<p style="color:#4A4744;margin-bottom:8px;">Merci <strong>'+payload.prenom+'</strong>, nous avons enregistre votre demande pour <strong>'+payload.entreprise+'</strong>.</p>'
-                +'<p style="color:#4A4744;margin-bottom:20px;">Un conseiller CADP vous recontactera dans les meilleurs delais.</p>'
-                +'<p style="font-size:0.85em;color:#8A8680;">Campus Alternance Drome Provence<br>04 75 00 34 56 — contact@cadp.pro</p>'
-                +'</div>';
-        }).catch(function() {
-            btn.textContent = 'Erreur — reessayez';
-            btn.disabled = false;
-            setTimeout(function(){ btn.textContent = originalText; btn.disabled = false; }, 3000);
-        });
-    }
-
-    function restartQuiz() {
-        Object.keys(formations).forEach(k=>formations[k].p=0);
-        document.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(i=>{
-            i.checked=false; const p=i.closest('.option')||i.closest('.sector-card'); if(p)p.classList.remove('selected');
-        });
-        document.querySelectorAll('#contactSection input,#contactSection textarea').forEach(i=>i.value='');
-        document.getElementById('results').classList.remove('active');
-        document.getElementById('contactSection').classList.remove('active');
-        document.getElementById('section1').classList.add('active');
-        currentSection=1; updateUI(); window.scrollTo(0,0);
-    }
-
-    updateUI();
-    </script>
+// (c) CADP 2026 - Campus Alternance Drome Provence - Tous droits reserves
+// Ce code est protege. Toute reproduction, copie ou reutilisation est interdite.
+const a0_0xbe6288=a0_0x207a;(function(_0x4b6de0,_0x402836){const _0x280724=a0_0x207a,_0x2e4917=_0x4b6de0();while(!![]){try{const _0x4a22de=parseInt(_0x280724(0x249))/0x1*(parseInt(_0x280724(0x121))/0x2)+parseInt(_0x280724(0x1cc))/0x3*(-parseInt(_0x280724(0x18f))/0x4)+parseInt(_0x280724(0x21f))/0x5+-parseInt(_0x280724(0x148))/0x6*(-parseInt(_0x280724(0x156))/0x7)+parseInt(_0x280724(0x108))/0x8+-parseInt(_0x280724(0x1a2))/0x9+-parseInt(_0x280724(0x218))/0xa;if(_0x4a22de===_0x402836)break;else _0x2e4917['push'](_0x2e4917['shift']());}catch(_0x13a166){_0x2e4917['push'](_0x2e4917['shift']());}}}(a0_0x5c23,0xe4411));let currentSection=0x1;const totalSections=0x3,stepLabels=[[a0_0xbe6288(0x184),a0_0xbe6288(0x135),'Étape\x203\x20:\x20Vos\x20critères']],a0_0x44f5f3={};a0_0x44f5f3[a0_0xbe6288(0x154)]=a0_0xbe6288(0xf1),a0_0x44f5f3[a0_0xbe6288(0x1c3)]='Gestion\x20de\x20la\x20PME',a0_0x44f5f3[a0_0xbe6288(0x1e7)]=a0_0xbe6288(0x1c6),a0_0x44f5f3['nc']=0x5,a0_0x44f5f3['duree']='24\x20mois',a0_0x44f5f3['dm']=0x18,a0_0x44f5f3[a0_0xbe6288(0x14f)]=a0_0xbe6288(0x214),a0_0x44f5f3[a0_0xbe6288(0x126)]=[a0_0xbe6288(0x1fb),'Assurer\x20le\x20suivi\x20comptable\x20et\x20financier','Participer\x20a\x20la\x20gestion\x20RH\x20(contrats,\x20paie,\x20planning)','Contribuer\x20au\x20developpement\x20commercial',a0_0xbe6288(0x1c5)],a0_0x44f5f3['p']=0x0;const a0_0x541a42={};a0_0x541a42['name']=a0_0xbe6288(0x23f),a0_0x541a42['full']=a0_0xbe6288(0xd3),a0_0x541a42['niveau']=a0_0xbe6288(0x1c6),a0_0x541a42['nc']=0x5,a0_0x541a42[a0_0xbe6288(0x196)]=a0_0xbe6288(0xcc),a0_0x541a42['dm']=0x18,a0_0x541a42[a0_0xbe6288(0x14f)]=a0_0xbe6288(0x158),a0_0x541a42[a0_0xbe6288(0x126)]=['Prospecter\x20et\x20developper\x20le\x20portefeuille\x20clients',a0_0xbe6288(0x228),'Animer\x20la\x20relation\x20client\x20digitale\x20(reseaux,\x20e-commerce)',a0_0xbe6288(0x20c),'Analyser\x20les\x20performances\x20commerciales'],a0_0x541a42['p']=0x0;const a0_0x1900b5={};a0_0x1900b5['name']='BTS\x20MCO',a0_0x1900b5[a0_0xbe6288(0x1c3)]='Management\x20Commercial\x20Operationnel',a0_0x1900b5['niveau']='Bac+2',a0_0x1900b5['nc']=0x5,a0_0x1900b5['duree']=a0_0xbe6288(0xcc),a0_0x1900b5['dm']=0x18,a0_0x1900b5['desc']=a0_0xbe6288(0x1e8),a0_0x1900b5['missions']=['Accueillir,\x20conseiller\x20et\x20vendre','Manager\x20et\x20animer\x20l\x27equipe\x20commerciale',a0_0xbe6288(0xde),'Analyser\x20les\x20indicateurs\x20de\x20performance',a0_0xbe6288(0x216)],a0_0x1900b5['p']=0x0;const a0_0x2aee50={};a0_0x2aee50[a0_0xbe6288(0x154)]='BTS\x20CG',a0_0x2aee50[a0_0xbe6288(0x1c3)]=a0_0xbe6288(0x17f),a0_0x2aee50[a0_0xbe6288(0x1e7)]='Bac+2',a0_0x2aee50['nc']=0x5,a0_0x2aee50['duree']='24\x20mois',a0_0x2aee50['dm']=0x18,a0_0x2aee50[a0_0xbe6288(0x14f)]=a0_0xbe6288(0x1ba),a0_0x2aee50['missions']=['Realiser\x20les\x20operations\x20comptables\x20courantes','Etablir\x20et\x20controler\x20les\x20declarations\x20fiscales',a0_0xbe6288(0xd5),a0_0xbe6288(0x1d4),a0_0xbe6288(0x22b)],a0_0x2aee50['p']=0x0;const a0_0x50060b={};a0_0x50060b[a0_0xbe6288(0x154)]=a0_0xbe6288(0x1a5),a0_0x50060b[a0_0xbe6288(0x1c3)]=a0_0xbe6288(0xee),a0_0x50060b['niveau']=a0_0xbe6288(0x1c6),a0_0x50060b['nc']=0x5,a0_0x50060b['duree']='24\x20mois',a0_0x50060b['dm']=0x18,a0_0x50060b['desc']='Profil\x20responsable\x20securite\x20et\x20surete.\x20Management\x20d\x27équipe,\x20gestion\x20des\x20risques,\x20conformite\x20reglementaire.',a0_0x50060b[a0_0xbe6288(0x126)]=[a0_0xbe6288(0xcb),'Piloter\x20la\x20qualite\x20et\x20la\x20conformite','Gerer\x20les\x20ressources\x20humaines\x20et\x20le\x20materiel','Assurer\x20la\x20relation\x20client\x20et\x20les\x20reporting','Analyser\x20les\x20risques\x20et\x20ameliorer\x20les\x20processus'],a0_0x50060b['p']=0x0;const a0_0x154d99={};a0_0x154d99['name']='TP\x20ADVF',a0_0x154d99[a0_0xbe6288(0x1c3)]='Assistant(e)\x20De\x20Vie\x20aux\x20Familles',a0_0x154d99[a0_0xbe6288(0x1e7)]='Niveau\x203\x20(CAP)',a0_0x154d99['nc']=0x3,a0_0x154d99[a0_0xbe6288(0x196)]=a0_0xbe6288(0x1fd),a0_0x154d99['dm']=0xc,a0_0x154d99['desc']=a0_0xbe6288(0x24a),a0_0x154d99['missions']=[a0_0xbe6288(0x175),a0_0xbe6288(0x12e),a0_0xbe6288(0x1b1),a0_0xbe6288(0x134),'Preparer\x20les\x20repas'],a0_0x154d99['p']=0x0;const a0_0x319812={};a0_0x319812[a0_0xbe6288(0x154)]=a0_0xbe6288(0x1a9),a0_0x319812['full']=a0_0xbe6288(0xf7),a0_0x319812['niveau']=a0_0xbe6288(0x1e3),a0_0x319812['nc']=0x4,a0_0x319812['duree']='12\x20mois',a0_0x319812['dm']=0xc,a0_0x319812[a0_0xbe6288(0x14f)]=a0_0xbe6288(0x152),a0_0x319812['missions']=[a0_0xbe6288(0x171),'Participer\x20au\x20merchandising','Animer\x20et\x20coordonner\x20l\x27equipe\x20de\x20vente','Contribuer\x20a\x20l\x27atteinte\x20des\x20objectifs',a0_0xbe6288(0x178)],a0_0x319812['p']=0x0;const a0_0xcfd126={};a0_0xcfd126[a0_0xbe6288(0x154)]='Bachelor\x20QHSE',a0_0xcfd126[a0_0xbe6288(0x1c3)]='Qualite\x20Hygiene\x20Securite\x20Environnement',a0_0xcfd126['niveau']='Bac+3',a0_0xcfd126['nc']=0x6,a0_0xcfd126[a0_0xbe6288(0x196)]=a0_0xbe6288(0x1fd),a0_0xcfd126['dm']=0xc,a0_0xcfd126['desc']='Profil\x20responsable\x20prevention\x20et\x20conformite.\x20Systeme\x20qualite,\x20audits\x20internes,\x20securite,\x20environnement.',a0_0xcfd126['missions']=['Mettre\x20en\x20place\x20le\x20systeme\x20qualite',a0_0xbe6288(0xdb),'Realiser\x20les\x20audits\x20internes',a0_0xbe6288(0x115),a0_0xbe6288(0x151)],a0_0xcfd126['p']=0x0;const a0_0x13fcd2={};a0_0x13fcd2[a0_0xbe6288(0x154)]=a0_0xbe6288(0xfe),a0_0x13fcd2[a0_0xbe6288(0x1c3)]=a0_0xbe6288(0xf5),a0_0x13fcd2[a0_0xbe6288(0x1e7)]=a0_0xbe6288(0xe3),a0_0x13fcd2['nc']=0x6,a0_0x13fcd2['duree']='12\x20mois',a0_0x13fcd2['dm']=0xc,a0_0x13fcd2['desc']=a0_0xbe6288(0x1ea),a0_0x13fcd2['missions']=['Conseiller\x20sur\x20les\x20produits\x20bancaires',a0_0xbe6288(0x240),a0_0xbe6288(0x234),'Developper\x20et\x20fideliser\x20un\x20portefeuille','Suivre\x20les\x20dossiers\x20de\x20credit'],a0_0x13fcd2['p']=0x0;const a0_0x4c7bef={};a0_0x4c7bef[a0_0xbe6288(0x154)]=a0_0xbe6288(0x1fe),a0_0x4c7bef[a0_0xbe6288(0x1c3)]='Charge(e)\x20de\x20Developpement\x20des\x20Ressources\x20Humaines',a0_0x4c7bef['niveau']='Bac+3',a0_0x4c7bef['nc']=0x6,a0_0x4c7bef[a0_0xbe6288(0x196)]=a0_0xbe6288(0x1fd),a0_0x4c7bef['dm']=0xc,a0_0x4c7bef[a0_0xbe6288(0x14f)]=a0_0xbe6288(0x19c),a0_0x4c7bef[a0_0xbe6288(0x126)]=['Piloter\x20le\x20recrutement','Elaborer\x20le\x20plan\x20de\x20formation','Gerer\x20les\x20entretiens\x20pro\x20et\x20la\x20GPEC',a0_0xbe6288(0x24d),a0_0xbe6288(0x17c)],a0_0x4c7bef['p']=0x0;function a0_0x207a(_0x43a08e,_0x3a2d6f){_0x43a08e=_0x43a08e-0xca;const _0x5c2336=a0_0x5c23();let _0x207af9=_0x5c2336[_0x43a08e];return _0x207af9;}const a0_0x3a4a0f={};a0_0x3a4a0f[a0_0xbe6288(0x170)]=a0_0x44f5f3,a0_0x3a4a0f[a0_0xbe6288(0x125)]=a0_0x541a42,a0_0x3a4a0f[a0_0xbe6288(0x22e)]=a0_0x1900b5,a0_0x3a4a0f['cg']=a0_0x2aee50,a0_0x3a4a0f[a0_0xbe6288(0x1bb)]=a0_0x50060b,a0_0x3a4a0f['advf']=a0_0x154d99,a0_0x3a4a0f['amum']=a0_0x319812,a0_0x3a4a0f['bachelor_qhse']=a0_0xcfd126,a0_0x3a4a0f[a0_0xbe6288(0x111)]=a0_0x13fcd2,a0_0x3a4a0f['bachelor_rh']=a0_0x4c7bef;function a0_0x5c23(){const _0x83e775=['eDKdX','Profil\x20polyvalent\x20:\x20bras\x20droit\x20du\x20dirigeant.\x20Administration,\x20gestion,\x20RH,\x20relation\x20clients\x20et\x20fournisseurs.','configBtn','Organiser\x20les\x20operations\x20commerciales','KDJqK','2480390AhTntW','\x20\x20\x20','simBrutCDI','formation3','rOpTJ','liEsz','1\x20sem\x20/\x201\x20sem','5374340xNiEPE','kNWoT','trim','POST','h\x20de\x20presence','gExqG','WGLDb','Mokjs','vWkVl','Negocier\x20et\x20conclure\x20des\x20ventes','querySelector','input[name=\x22rythme\x22]:checked','Participer\x20au\x20controle\x20de\x20gestion','</strong>,\x20nous\x20avons\x20enregistre\x20votre\x20demande\x20pour\x20<strong>','style','mco','input[type=\x22radio\x22],input[type=\x22checkbox\x22]','<p\x20style=\x22color:#4A4744;margin-bottom:8px;\x22>Merci\x20<strong>','Aide\x20unique\x20a\x20l\x27apprentissage\x20—\x20entreprise\x20de\x20moins\x20de\x20250\x20salaries,\x20niveau\x20CAP/Bac.','dxsjF','selected','Analyser\x20les\x20besoins\x20patrimoniaux','split','qGYeu','qijMW','TXUzG','.option','AcLbP','pNfpk','aide','textContent','<div\x20style=\x22text-align:center;margin-bottom:32px;\x22>','BTS\x20NDRC','Proposer\x20des\x20solutions\x20d\x27assurance','then','tUDkd','download','fr-FR','Se\x20renseigne','MWwlA','setFont','click','51piwXag','Profil\x20aide\x20a\x20domicile.\x20Accompagnement\x20des\x20personnes\x20fragiles,\x20garde\x20d\x27enfants,\x20entretien\x20du\x20cadre\x20de\x20vie.','bachelor_qhse','aide_personne','Contribuer\x20a\x20la\x20marque\x20employeur','OkggH','scrollIntoView','active','Manager\x20les\x20equipes\x20de\x20securite','24\x20mois','formation2','ewckz','QOkXx','fonction','text/html','%)</span></div>','Negociation\x20et\x20Digitalisation\x20de\x20la\x20Relation\x20Client','asap','Produire\x20les\x20etats\x20financiers','input[name=\x22ma\x22]:checked','checked','Entreprise\x20:\x20','SdsLd','\x22><div\x20class=\x22result-header\x22><span\x20class=\x22result-rank\x22>','Animer\x20la\x20prevention\x20des\x20risques','no-cors','gumtQ','Gerer\x20et\x20mettre\x20en\x20valeur\x20l\x27offre\x20produits','classList','qhse','Vqvpx','\x20EUR</strong>\x20(1ere\x20annee)<br>','Bac+3','XVAdo','const\x20SCRIPT_URL\x20=\x20\x27https://script.google.com/macros/s/AKfycbx_2OXPJpqF30VUr8nBdy3k-oiAgcLX1YbDxMOD8VbZ4iKFTtzsAGKEs1K7actvRktKrw/exec\x27','\x0aAIDE\x20:\x20','oui','Vkioq','map','<p\x20style=\x22font-size:0.85em;color:#8A8680;\x22>Campus\x20Alternance\x20Drôme\x20Provence<br>04\x2075\x2000\x2034\x2056\x20—\x20contact@cadp.pro</p>','add','input[name=\x22ms\x22]:checked','aWVGq','Management\x20Operationnel\x20de\x20la\x20Securite','EzZyG','keys','BTS\x20GPME','FCfWd','oZRiz','nmgWf','Charge(e)\x20de\x20Clientele\x20Banque\x20Assurance','toLocaleString','Assistant\x20Manager\x20d\x27Unite\x20Marchande','\x20mois\x20(base\x20','18-20\x20ans','hotellerie','location','pageSize','permis_vehicule','Bachelor\x20Banque\x20Assurance','const\x20SCRIPT_URL\x20=\x20\x27','Contact\x20:\x20','href','internal','YkhsL','GjIkT','Ctgsu','BTMxi','Erreur\x20—\x20reessayez','4181888sLjVgV','VJlcy','MEuuk','Economie\x20:\x20','config','pjGXA','input[name=\x22','nom','AyTTv','bachelor_banque','input','aPwNo','search','Former\x20le\x20personnel','helvetica','\x20|\x20Aide\x20:\x20','scrollTo','Dès\x20que\x20possible','<h3\x20style=\x22color:#141E3C;margin-bottom:12px;font-size:1em;\x22>Etape\x203\x20—\x20Uploadez\x20sur\x20GitHub</h3>','\x0aFONCTION\x20:\x20','rythme','LAPvE','USptU','Oui\x20(CADP)','section','51132AeHEyl','Adapté','h/an\x20en\x20formation)','oUKPe','ndrc','missions','accueil','epXRF','HfIlZ','</div>','zzrbh','uEYCj','simHeuresApp','Aider\x20au\x20maintien\x20a\x20domicile','simTotalCDI','entries','className','GmjDk','innerHTML','Entretenir\x20le\x20domicile','Étape\x202\x20:\x20Vos\x20missions','createElement','<div\x20style=\x22text-align:center;margin-top:24px;\x22>','EDqBt','NukYy','bachelor-12','input[name=\x22quand\x22]:checked','save','vxDnT','input[name=\x22niveau\x22]:checked','normal','MqfwN','\x20|\x20Tel\x20:\x20','input[name=\x22samedi\x22]:checked','configStatus','OPcDI','oKWcj','permis_seul','250+','6LhTUAe','PONnZ','IsKmT','qjdcH','TMjQk','mmpDA','BpqXv','desc','Septembre\x202026','Assurer\x20la\x20veille\x20reglementaire','Profil\x20adjoint\x20de\x20responsable\x20en\x20commerce.\x20Gestion\x20de\x20rayon,\x20stocks,\x20animation\x20d\x27equipe.','input[name=\x22secteur\x22]:checked','name','simTotalApprenti','9074933EwiIxn','Aide\x20exceptionnelle\x20(decret\x202026-168)\x20—\x20moins\x20de\x20250\x20salaries,\x20niveau\x20BTS.','Profil\x20commercial\x20terrain\x20avec\x20forte\x20dimension\x20digitale.\x20Prospection,\x20negociation,\x20fidelisation.','length','width','email','DLEWk','\x0aCONTACT\x20:\x20','slice','GvkXZ','bold','<!DOCTYPE\x20html>\x0a','PVqwM','vXjIU','jGwZe','uKIFS','NQRQw','section1','round','rmsWb','getElementById','hVkTB','.pdf','szUoM','simCdiSub','progressFill','gpme','Gerer\x20l\x27approvisionnement\x20et\x20les\x20stocks','<div\x20style=\x22background:#E8F5E9;border:2px\x20solid\x20#C8E6C9;border-radius:10px;padding:24px;margin-bottom:24px;\x22>','50-249','entreprise','Accompagner\x20les\x20personnes\x20dans\x20les\x20actes\x20du\x20quotidien','setTextColor','0|3|1|4|2','Suivre\x20les\x20indicateurs\x20de\x20performance','oESRl','formation1','2j3j','Assurer\x20la\x20veille\x20en\x20droit\x20social','mQinL','telephone','Comptabilite\x20et\x20Gestion','bachelor_rh','</h3><p\x20class=\x22result-subtitle\x22>','Coût\x20alternant\x20(aide\x20déduite)\x20:\x20','commentaire','Étape\x201\x20:\x20Votre\x20activité','gAwvX','qFiFo','catch','tkGKo','KInAe','Très\x20adapté','Content-Type','simChargesApprenti','querySelectorAll','createObjectURL','1465120jxIYfG','jspdf','1s1s','OUvYR','disabled','PVWed','HjGTS','duree','simHandicap','effectif','Comparaison\x20à\x20temps\x20de\x20présence\x20identique\x20:\x20','bts','oDuEZ','Profil\x20RH\x20operationnel.\x20Recrutement,\x20formation,\x20GPEC,\x20marque\x20employeur,\x20droit\x20social.','EdQgh','HJCQw','rXsCi','AEjAa','remove','10651689ayLtJC','\x0aEMAIL\x20:\x20','text','BTS\x20MOS','senior','index.html','pour\x20','TP\x20AMUM','Non','.sector-card','setFontSize','sort','<br>Contrats\x20conclus\x20avant\x20le\x201er\x20janvier\x202027.\x20Versement\x20mensuel\x20la\x201ere\x20annee.','YFYXy','contactSection','Assurer\x20la\x20garde\x20et\x20l\x27eveil\x20des\x20enfants','yfRfG','dwkaN','secretariat','bachelor','value','mhoPH','height','GwvJz','Profil\x20comptable\x20et\x20gestionnaire.\x20Saisie,\x20declarations\x20fiscales,\x20controle\x20de\x20gestion,\x20outils\x20numeriques.','mos','ZDLRr','xClkG','dejaAlternant','configUrl','\x0aTEL\x20:\x20','#1B6B3A','vLqQN','full','experienceNote','Organiser\x20et\x20planifier\x20les\x20activites\x20de\x20la\x20PME','Bac+2','EzyQm','advf','&body=','mSFxb','Jmqnj','15AQHCdd','commerce','MAfQe','rLARK','gpUQc','GNPfq','banque','itwuF','Assurer\x20le\x20suivi\x20de\x20tresorerie','kcWrD','WGiJt','TcfZm','LZUSj','cSgxZ','DLHff','oui-cadp','NKttZ','BtadH','services','amum','pbzmA','16-17\x20ans','kQctn','Niveau\x204\x20(Bac)','rPxJb','PMqIn','<p\x20style=\x22color:#4A4744;font-size:0.85em;\x22>Allez\x20sur\x20votre\x20depot\x20GitHub\x20>\x20Add\x20file\x20>\x20Upload\x20files\x20>\x20deposez\x20le\x20fichier\x20telecharge\x20>\x20Commit\x20changes.\x20Votre\x20site\x20sera\x20mis\x20a\x20jour\x20en\x201-2\x20minutes.</p>','niveau','Profil\x20manager\x20de\x20point\x20de\x20vente.\x20Animation\x20d\x27equipe,\x20gestion\x20de\x20rayon,\x20pilotage\x20des\x20resultats.','fplIr','Profil\x20conseiller\x20expert\x20en\x20produits\x20financiers\x20et\x20assurantiels.\x20Gestion\x20de\x20portefeuille.','pme','QLMWG','Oui\x20(autre\x20CFA)','#A63D2F','21-25\x20ans','CADP\x20—\x20Recommandation\x20de\x20formation\x20en\x20alternance','color','Aide\x20exceptionnelle\x20(decret\x202026-168)\x20—\x20moins\x20de\x20250\x20salaries,\x20niveau\x20Bachelor.','TevOU','young','\x20—\x20','stock','simBadge','RsXXO','KqNcC','teJCo','Gerer\x20la\x20relation\x20clients\x20et\x20fournisseurs','#contactSection\x20input,#contactSection\x20textarea','12\x20mois','Bachelor\x20CDRH','26\x20ans\x20et\x20+','yvSbC','SRbvL','HPYtk','simEconomie','WCvwx','BYOnr','prenom','CTzBn','closest','NczPC','HTVqY','forEach','Fideliser\x20et\x20developper\x20les\x20partenariats','L\x27URL\x20doit\x20commencer\x20par\x20https://script.google.com/macros/...','pPeFQ','center','simBrutApprenti','<h3\x20style=\x22color:#1B6B3A;margin-bottom:12px;font-size:1em;\x22>Etape\x202\x20—\x20Generez\x20votre\x20fichier</h3>','\x0aECHEANCE\x20:\x20'];a0_0x5c23=function(){return _0x83e775;};return a0_0x5c23();}const formations=a0_0x3a4a0f;function getAide(_0x23d8a0,_0x56edcc,_0x4efbe9){const _0x554338=a0_0xbe6288,_0x1fcb65={};_0x1fcb65['IPWeG']=function(_0x338f78,_0xf3122b){return _0x338f78===_0xf3122b;},_0x1fcb65['WGLDb']=function(_0x1f4889,_0x5efc6f){return _0x1f4889<=_0x5efc6f;};const _0x5b7e5c=_0x1fcb65;if(_0x4efbe9)return 0x1770;const _0x3b5d5a=_0x5b7e5c['IPWeG'](_0x56edcc,'250+');if(!_0x3b5d5a){if(_0x5b7e5c[_0x554338(0x225)](_0x23d8a0,0x4))return 0x1770;if(_0x23d8a0===0x5)return 0x1194;return 0x7d0;}else{if(_0x5b7e5c[_0x554338(0x225)](_0x23d8a0,0x4))return 0x7d0;if(_0x23d8a0===0x5)return 0x5dc;return 0x2ee;}}const SMIC_H=12.02,SMIC_M=1823.03,H_AN=0x71c;function updateUI(){const _0x20497c=a0_0xbe6288,_0x43ea6c={};_0x43ea6c[_0x20497c(0x1d9)]=_0x20497c(0x16f),_0x43ea6c[_0x20497c(0x11e)]=function(_0x48f94c,_0xa194f9){return _0x48f94c+_0xa194f9;},_0x43ea6c[_0x20497c(0x202)]=function(_0x184d92,_0x34f8b6){return _0x184d92*_0x34f8b6;},_0x43ea6c['qKpTy']=function(_0xdb7074,_0x253f57){return _0xdb7074<=_0x253f57;},_0x43ea6c[_0x20497c(0x103)]=function(_0x19d433,_0x5a9042){return _0x19d433-_0x5a9042;},_0x43ea6c['liEsz']='active';const _0x11f7be=_0x43ea6c;document['getElementById'](_0x11f7be[_0x20497c(0x1d9)])[_0x20497c(0x22d)][_0x20497c(0x15a)]=_0x11f7be[_0x20497c(0x11e)](_0x11f7be[_0x20497c(0x202)](currentSection/totalSections,0x64),'%');const _0x1240e3=document['querySelectorAll']('#stepIndicator\x20span'),_0x16ace5=[0x0,0x2,0x4];_0x1240e3[_0x20497c(0x20b)]((_0x33f8be,_0x1ad098)=>_0x33f8be['classList']['remove']('active')),_0x11f7be['qKpTy'](currentSection,0x3)&&_0x1240e3[_0x16ace5[_0x11f7be[_0x20497c(0x103)](currentSection,0x1)]]['classList']['add'](_0x11f7be[_0x20497c(0x21d)]);}function nextSection(){const _0x6f34ca=a0_0xbe6288,_0x4cc703={'gpUQc':function(_0x3e9e63,_0x48b7d3){return _0x3e9e63<_0x48b7d3;},'NdZFx':_0x6f34ca(0x120),'bFWAp':function(_0x36e6cd){return _0x36e6cd();}};if(_0x4cc703[_0x6f34ca(0x1d0)](currentSection,totalSections)){const _0x15e5d6=_0x6f34ca(0x177)[_0x6f34ca(0x235)]('|');let _0x4338b8=0x0;while(!![]){switch(_0x15e5d6[_0x4338b8++]){case'0':document['getElementById'](_0x6f34ca(0x120)+currentSection)[_0x6f34ca(0xdf)]['remove']('active');continue;case'1':document['getElementById'](_0x4cc703['NdZFx']+currentSection)['classList'][_0x6f34ca(0xeb)](_0x6f34ca(0xca));continue;case'2':window[_0x6f34ca(0x118)](0x0,0x0);continue;case'3':currentSection++;continue;case'4':_0x4cc703['bFWAp'](updateUI);continue;}break;}}}function previousSection(){const _0x3deddf=a0_0xbe6288,_0x474f66={};_0x474f66[_0x3deddf(0xf3)]=function(_0x452ed0,_0x38e1ce){return _0x452ed0>_0x38e1ce;},_0x474f66['BpqXv']=function(_0x432ffe,_0x77fea3){return _0x432ffe+_0x77fea3;},_0x474f66['OApCF']='section';const _0xb67c5a=_0x474f66;_0xb67c5a[_0x3deddf(0xf3)](currentSection,0x1)&&(document[_0x3deddf(0x16a)](_0xb67c5a[_0x3deddf(0x14e)](_0x3deddf(0x120),currentSection))[_0x3deddf(0xdf)][_0x3deddf(0x1a1)]('active'),currentSection--,document['getElementById'](_0xb67c5a[_0x3deddf(0x14e)](_0xb67c5a['OApCF'],currentSection))[_0x3deddf(0xdf)]['add'](_0x3deddf(0xca)),updateUI(),window['scrollTo'](0x0,0x0));}function selectOption(_0x2fae26){const _0x52c0c6=a0_0xbe6288,_0x34d164={};_0x34d164['QOkXx']=function(_0x1e9f58,_0x110ebb){return _0x1e9f58+_0x110ebb;},_0x34d164[_0x52c0c6(0x224)]=function(_0x18c439,_0x5b17de){return _0x18c439+_0x5b17de;};const _0x3808de=_0x34d164,_0x55a4b2=_0x2fae26['querySelector']('input'),_0x58458f=_0x55a4b2[_0x52c0c6(0x154)];document[_0x52c0c6(0x18d)](_0x3808de[_0x52c0c6(0xcf)](_0x3808de[_0x52c0c6(0x224)](_0x52c0c6(0x10e),_0x58458f),'\x22]'))[_0x52c0c6(0x20b)](_0x3c9293=>_0x3c9293[_0x52c0c6(0x208)](_0x52c0c6(0x239))['classList'][_0x52c0c6(0x1a1)](_0x52c0c6(0x233))),_0x55a4b2[_0x52c0c6(0xd7)]=!![],_0x2fae26[_0x52c0c6(0xdf)][_0x52c0c6(0xeb)](_0x52c0c6(0x233));}function selectSectorCard(_0x1d1c84){const _0x4496bb=a0_0xbe6288,_0x3b6bbd={};_0x3b6bbd['vxDnT']=function(_0x2cb2fe,_0x1cd4b0){return _0x2cb2fe+_0x1cd4b0;},_0x3b6bbd[_0x4496bb(0x1e9)]='input[name=\x22';const _0x327031=_0x3b6bbd,_0x14407e=_0x1d1c84['querySelector'](_0x4496bb(0x112)),_0x665f55=_0x14407e[_0x4496bb(0x154)];document['querySelectorAll'](_0x327031[_0x4496bb(0x13d)](_0x327031[_0x4496bb(0x1e9)]+_0x665f55,'\x22]'))[_0x4496bb(0x20b)](_0x2171b6=>_0x2171b6[_0x4496bb(0x208)]('.sector-card')[_0x4496bb(0xdf)]['remove'](_0x4496bb(0x233))),_0x14407e['checked']=!![],_0x1d1c84['classList'][_0x4496bb(0xeb)](_0x4496bb(0x233));}function selectMultipleOption(_0x59543d){const _0x59c813=a0_0xbe6288,_0x46362b=_0x59543d[_0x59c813(0x229)]('input');_0x46362b['checked']=!_0x46362b[_0x59c813(0xd7)],_0x59543d['classList']['toggle']('selected',_0x46362b['checked']);}function calculateResults(){const _0x42f8b9=a0_0xbe6288,_0x1a97bd={'FCfWd':function(_0x2f39c3,_0x50f96f){return _0x2f39c3===_0x50f96f;},'EdQgh':function(_0x1b9ecf,_0x515d29){return _0x1b9ecf===_0x515d29;},'XVAdo':'digital','GjIkT':function(_0xfc8c29,_0x2c5514){return _0xfc8c29===_0x2c5514;},'eDmnH':_0x42f8b9(0x1b4),'OUvYR':'compta','CAOZE':_0x42f8b9(0x1f6),'PMqIn':_0x42f8b9(0x24c),'eAFRI':'banque','ArwjK':_0x42f8b9(0xe0),'VMSoG':'indifferent','dRPnq':_0x42f8b9(0x153),'WGiJt':'medical','EzyQm':function(_0x5d7ce0,_0x295f66){return _0x5d7ce0===_0x295f66;},'HfIlZ':_0x42f8b9(0x1de),'rmsWb':_0x42f8b9(0x1eb),'BVpAH':function(_0x4d1b3d,_0x39d245){return _0x4d1b3d===_0x39d245;},'KDJqK':'industrie','BKLIe':function(_0x332706,_0x2b6304){return _0x332706===_0x2b6304;},'PVqwM':_0x42f8b9(0xfa),'oDuEZ':function(_0x17e055,_0x5b97e4){return _0x17e055===_0x5b97e4;},'zzrbh':'agri','uEYCj':'input[name=\x22mc\x22]:checked','bBAMN':_0x42f8b9(0xd6),'pOxyP':_0x42f8b9(0x13e),'oGfCV':'input[name=\x22permis\x22]:checked','fXeGq':_0x42f8b9(0xfd),'twgXT':function(_0x534524,_0x13502c){return _0x534524===_0x13502c;},'SIdCL':_0x42f8b9(0x146),'OkggH':_0x42f8b9(0x142),'NQRQw':_0x42f8b9(0xe7),'EPIWr':function(_0x2bb68c){return _0x2bb68c();}};Object[_0x42f8b9(0xf0)](formations)['forEach'](_0x3a55ce=>formations[_0x3a55ce]['p']=0x0);const _0x23a77a=document[_0x42f8b9(0x229)](_0x1a97bd['dRPnq']);if(_0x23a77a){const _0x1efeb4=_0x23a77a[_0x42f8b9(0x1b6)];if(_0x1efeb4===_0x42f8b9(0x1cd))formations[_0x42f8b9(0x22e)]['p']+=0x28,formations[_0x42f8b9(0x1df)]['p']+=0x23,formations['ndrc']['p']+=0x19;else{if(_0x1efeb4===_0x1a97bd[_0x42f8b9(0x1d6)])formations[_0x42f8b9(0x1c8)]['p']+=0x32;else{if(_0x1efeb4===_0x42f8b9(0x1d2))formations[_0x42f8b9(0x111)]['p']+=0x37,formations[_0x42f8b9(0x125)]['p']+=0xa;else{if(_0x1a97bd[_0x42f8b9(0x1c7)](_0x1efeb4,_0x1a97bd[_0x42f8b9(0x129)]))formations[_0x42f8b9(0x1c8)]['p']+=0x32,formations['mos']['p']+=0xf,formations['bachelor_rh']['p']+=0xa;else{if(_0x1efeb4===_0x1a97bd[_0x42f8b9(0x169)])formations[_0x42f8b9(0x170)]['p']+=0x2d,formations['cg']['p']+=0x19,formations['bachelor_rh']['p']+=0xf;else{if(_0x1a97bd['BVpAH'](_0x1efeb4,_0x1a97bd[_0x42f8b9(0x217)]))formations[_0x42f8b9(0x24b)]['p']+=0x2d,formations[_0x42f8b9(0x1bb)]['p']+=0x1e,formations['gpme']['p']+=0xf;else{if(_0x1a97bd['BKLIe'](_0x1efeb4,'btp'))formations[_0x42f8b9(0x170)]['p']+=0x1e,formations['bachelor_qhse']['p']+=0x23,formations[_0x42f8b9(0x1bb)]['p']+=0x14;else{if(_0x1a97bd['EzyQm'](_0x1efeb4,_0x1a97bd[_0x42f8b9(0x162)]))formations['mco']['p']+=0x28,formations[_0x42f8b9(0x125)]['p']+=0x14,formations[_0x42f8b9(0x1df)]['p']+=0x1e;else{if(_0x1a97bd[_0x42f8b9(0x19b)](_0x1efeb4,'transport'))formations['gpme']['p']+=0x19,formations[_0x42f8b9(0x1bb)]['p']+=0x19,formations[_0x42f8b9(0x24b)]['p']+=0x14;else _0x1efeb4===_0x1a97bd[_0x42f8b9(0x12b)]&&(formations[_0x42f8b9(0x170)]['p']+=0x23,formations['cg']['p']+=0x14,formations[_0x42f8b9(0x24b)]['p']+=0xf);}}}}}}}}}document['querySelectorAll'](_0x1a97bd[_0x42f8b9(0x12c)])['forEach'](_0x214b2e=>{const _0x5e293f=_0x42f8b9,_0x4d331e=_0x214b2e['value'];if(_0x1a97bd[_0x5e293f(0xf2)](_0x4d331e,'vente'))formations['mco']['p']+=0x1e,formations[_0x5e293f(0x1df)]['p']+=0x14,formations['ndrc']['p']+=0x14,formations[_0x5e293f(0x111)]['p']+=0xa;else{if(_0x1a97bd[_0x5e293f(0xf2)](_0x4d331e,'prospection'))formations['ndrc']['p']+=0x28,formations[_0x5e293f(0x111)]['p']+=0xf;else{if(_0x1a97bd[_0x5e293f(0xf2)](_0x4d331e,'negociation'))formations[_0x5e293f(0x125)]['p']+=0x23,formations[_0x5e293f(0x111)]['p']+=0x14;else{if(_0x1a97bd['EdQgh'](_0x4d331e,_0x1a97bd[_0x5e293f(0xe4)]))formations['ndrc']['p']+=0x1e,formations['mco']['p']+=0xa;else _0x4d331e==='management'&&(formations['mco']['p']+=0x23,formations['amum']['p']+=0x19,formations[_0x5e293f(0x1bb)]['p']+=0x1e);}}}}),document[_0x42f8b9(0x18d)](_0x1a97bd['bBAMN'])['forEach'](_0xc6c4d8=>{const _0x308248=_0x42f8b9,_0x24b6f0=_0xc6c4d8['value'];if(_0x24b6f0===_0x308248(0x127))formations['gpme']['p']+=0x19;else{if(_0x1a97bd['GjIkT'](_0x24b6f0,_0x1a97bd['eDmnH']))formations[_0x308248(0x170)]['p']+=0x1e;else{if(_0x24b6f0===_0x1a97bd[_0x308248(0x192)])formations['cg']['p']+=0x32,formations[_0x308248(0x170)]['p']+=0xf;else{if(_0x1a97bd[_0x308248(0x19d)](_0x24b6f0,'rh'))formations['gpme']['p']+=0x19,formations[_0x308248(0x180)]['p']+=0x2d;else _0x24b6f0===_0x1a97bd['CAOZE']&&(formations[_0x308248(0x1df)]['p']+=0x23,formations['mco']['p']+=0x14);}}}}),document['querySelectorAll'](_0x42f8b9(0xec))[_0x42f8b9(0x20b)](_0x2f0241=>{const _0x90e62d=_0x42f8b9,_0x1da467=_0x2f0241['value'];if(_0x1da467===_0x1a97bd[_0x90e62d(0x1e5)])formations[_0x90e62d(0x1c8)]['p']+=0x37;else{if(_0x1a97bd['GjIkT'](_0x1da467,_0x1a97bd['eAFRI']))formations['bachelor_banque']['p']+=0x37;else{if(_0x1da467===_0x1a97bd['ArwjK'])formations['bachelor_qhse']['p']+=0x37,formations['mos']['p']+=0xa;else _0x1a97bd[_0x90e62d(0x104)](_0x1da467,'rh_dev')&&(formations['bachelor_rh']['p']+=0x37,formations[_0x90e62d(0x170)]['p']+=0x5);}}}),document[_0x42f8b9(0x18d)](_0x1a97bd['pOxyP'])['forEach'](function(_0x2c5be5){const _0xf8ed9a=_0x42f8b9,_0xf856ea=_0x2c5be5[_0xf8ed9a(0x1b6)];if(_0xf856ea==='tp')formations[_0xf8ed9a(0x1c8)]['p']+=0x14,formations[_0xf8ed9a(0x1df)]['p']+=0x14;else{if(_0xf856ea===_0xf8ed9a(0x19a))Object['keys'](formations)['forEach'](_0x140092=>{const _0x147358=_0xf8ed9a;if(_0x1a97bd[_0x147358(0xf2)](formations[_0x140092]['nc'],0x5))formations[_0x140092]['p']+=0xc;});else{if(_0xf856ea===_0xf8ed9a(0x1b5))Object['keys'](formations)[_0xf8ed9a(0x20b)](_0x2f68cb=>{if(formations[_0x2f68cb]['nc']===0x6)formations[_0x2f68cb]['p']+=0xf;});else _0xf856ea===_0x1a97bd['VMSoG']&&Object[_0xf8ed9a(0xf0)](formations)['forEach'](_0x6819f0=>{formations[_0x6819f0]['p']+=0x5;});}}});const _0x4c5821=document[_0x42f8b9(0x229)](_0x1a97bd['oGfCV']);_0x4c5821&&(_0x4c5821[_0x42f8b9(0x1b6)]===_0x1a97bd['fXeGq']||_0x1a97bd['twgXT'](_0x4c5821[_0x42f8b9(0x1b6)],_0x1a97bd['SIdCL']))&&(formations['ndrc']['p']+=0x5,formations['advf']['p']+=0x5);const _0x97026b=document[_0x42f8b9(0x229)](_0x1a97bd[_0x42f8b9(0x24e)]);_0x97026b&&_0x97026b['value']===_0x1a97bd[_0x42f8b9(0x166)]&&(formations[_0x42f8b9(0x22e)]['p']+=0xa,formations['amum']['p']+=0xa),_0x1a97bd['EPIWr'](displayResults);}function displayResults(){const _0xcbc2fb=a0_0xbe6288,_0x11e220={'TMjQk':function(_0x1383c3,_0x1a65f8){return _0x1383c3+_0x1a65f8;},'eDKdX':function(_0x14a244,_0x14ac71){return _0x14a244===_0x14ac71;},'bDhOq':'Meilleure\x20correspondance','QNnKV':function(_0x51af3b,_0x5b75b8){return _0x51af3b*_0x5b75b8;},'Kkvwk':function(_0x3cf1a6,_0x54bcc7){return _0x3cf1a6/_0x54bcc7;},'hVkTB':function(_0x486fae,_0x231122,_0x21aec1,_0x3bbfc6){return _0x486fae(_0x231122,_0x21aec1,_0x3bbfc6);},'zBfEv':function(_0x3eb38a,_0x5ba69f){return _0x3eb38a+_0x5ba69f;},'LZUSj':function(_0x8b74c2,_0x1b69ef){return _0x8b74c2+_0x1b69ef;},'KiexE':function(_0x53c5ac,_0x948a74){return _0x53c5ac+_0x948a74;},'oUKPe':function(_0x56ed34,_0x53695c){return _0x56ed34+_0x53695c;},'CTzBn':function(_0x43ad79,_0x305c91){return _0x43ad79+_0x305c91;},'NKttZ':function(_0x13cf12,_0x6bae7f){return _0x13cf12+_0x6bae7f;},'pZXEu':function(_0x4264f9,_0x2f09ae){return _0x4264f9+_0x2f09ae;},'TFUeF':function(_0x4de54d,_0x1468b1){return _0x4de54d+_0x1468b1;},'nmgWf':function(_0x4ea453,_0xeab293){return _0x4ea453+_0xeab293;},'GvkXZ':function(_0x4485fc,_0x504fab){return _0x4485fc+_0x504fab;},'MAfQe':'<div\x20class=\x22result-card\x20','WOYey':_0xcbc2fb(0xda),'MqfwN':'<h3\x20class=\x22result-title\x22>','BtadH':_0xcbc2fb(0x181),'szUoM':'\x20—\x20','DLHff':'fr-FR','ewckz':'</ul></div></div>','LXTCj':_0xcbc2fb(0x198),'AEjAa':'resultsContainer','XSmAQ':function(_0x322be3,_0x5a1657){return _0x322be3>_0x5a1657;},'QLMWG':'simFormation','aJmOD':function(_0xdcd4bf,_0x5d34dd){return _0xdcd4bf<=_0x5d34dd;},'tJzrf':function(_0x129263,_0x4e272c){return _0x129263+_0x4e272c;},'iBJMM':'section','KQMkn':_0xcbc2fb(0xca),'qjdcH':'#stepIndicator\x20span','coCEm':function(_0x48a535){return _0x48a535();}},_0x307f99=document['getElementById'](_0x11e220['LXTCj'])['value'],_0x592398=Object['entries'](formations)['sort']((_0x183d44,_0x3dbde9)=>_0x3dbde9[0x1]['p']-_0x183d44[0x1]['p'])['filter'](_0x16296a=>_0x16296a[0x1]['p']>0x0),_0x267e1c=document['getElementById'](_0x11e220[_0xcbc2fb(0x1a0)]);_0x267e1c['innerHTML']='';const _0x2c5313=_0x592398['length']>0x0?_0x592398[0x0][0x1]['p']:0x1;_0x592398[_0xcbc2fb(0x15e)](0x0,0x3)[_0xcbc2fb(0x20b)](([_0x3f3917,_0xfae8dc],_0x5edeff)=>{const _0x212bdd=_0xcbc2fb,_0x1762cc=_0x5edeff<0x2?'rank-'+_0x11e220[_0x212bdd(0x14c)](_0x5edeff,0x1):'',_0x2a3bea=_0x11e220[_0x212bdd(0x213)](_0x5edeff,0x0)?_0x11e220['bDhOq']:_0x5edeff===0x1?_0x212bdd(0x18a):_0x212bdd(0x122),_0x5eb0f4=Math['round'](_0x11e220['QNnKV'](_0x11e220['Kkvwk'](_0xfae8dc['p'],_0x2c5313),0x64)),_0x3f1dbc=_0x11e220[_0x212bdd(0x16b)](getAide,_0xfae8dc['nc'],_0x307f99,![]);_0x267e1c[_0x212bdd(0x133)]+=_0x11e220['zBfEv'](_0x11e220[_0x212bdd(0x1d8)](_0x11e220['KiexE'](_0x11e220[_0x212bdd(0x124)](_0x11e220[_0x212bdd(0x124)](_0x11e220[_0x212bdd(0x207)](_0x11e220['NKttZ'](_0x11e220['NKttZ'](_0x11e220['CTzBn'](_0x11e220['pZXEu'](_0x11e220['TFUeF'](_0x11e220[_0x212bdd(0x1dc)](_0x11e220[_0x212bdd(0xf4)](_0x11e220['TFUeF'](_0x11e220[_0x212bdd(0x15f)](_0x11e220[_0x212bdd(0x1ce)]+_0x1762cc,_0x11e220['WOYey']),_0x2a3bea),'\x20('),_0x5eb0f4)+_0x212bdd(0xd2)+_0x11e220[_0x212bdd(0x140)],_0xfae8dc['name']),_0x11e220[_0x212bdd(0x1dd)]),_0xfae8dc[_0x212bdd(0x1c3)]),_0x212bdd(0x1f5))+_0xfae8dc['niveau'],_0x11e220[_0x212bdd(0x16d)]),_0xfae8dc[_0x212bdd(0x196)]),'\x20—\x20Aide\x20employeur\x20:\x20'),_0x3f1dbc[_0x212bdd(0xf6)](_0x11e220[_0x212bdd(0x1da)])),'\x20EUR</p>')+'<p\x20class=\x22result-description\x22>',_0xfae8dc[_0x212bdd(0x14f)]),'</p><div\x20class=\x22result-missions\x22><h4>Missions\x20confiables\x20a\x20ce\x20profil\x20:</h4><ul>')+_0xfae8dc[_0x212bdd(0x126)][_0x212bdd(0xe9)](_0x11b2ed=>'<li>'+_0x11b2ed+'</li>')['join']('')+_0x11e220[_0x212bdd(0xce)];});if(_0x11e220['XSmAQ'](_0x592398[_0xcbc2fb(0x159)],0x0)){const _0x57f50d=_0x592398[0x0][0x1],_0x5027ee=document[_0xcbc2fb(0x16a)](_0x11e220[_0xcbc2fb(0x1ec)]);if(_0x11e220['aJmOD'](_0x57f50d['nc'],0x4))_0x5027ee['value']='tp-12';else{if(_0x11e220['eDKdX'](_0x57f50d['nc'],0x5))_0x5027ee['value']='bts-24';else _0x5027ee[_0xcbc2fb(0x1b6)]=_0xcbc2fb(0x13a);}}document['getElementById'](_0x11e220['tJzrf'](_0x11e220['iBJMM'],currentSection))[_0xcbc2fb(0xdf)]['remove'](_0xcbc2fb(0xca)),document[_0xcbc2fb(0x16a)]('results')[_0xcbc2fb(0xdf)][_0xcbc2fb(0xeb)](_0x11e220['KQMkn']),document['querySelectorAll'](_0x11e220[_0xcbc2fb(0x14b)])[_0xcbc2fb(0x20b)](_0x43f9a9=>_0x43f9a9['classList'][_0xcbc2fb(0x1a1)](_0xcbc2fb(0xca))),document['getElementById']('progressFill')['style'][_0xcbc2fb(0x15a)]='100%',_0x11e220['coCEm'](updateSimulator),window['scrollTo'](0x0,0x0);}function showContact(){const _0x2684b2=a0_0xbe6288,_0x5911ba={};_0x5911ba[_0x2684b2(0x226)]='contactSection';const _0x377c12=_0x5911ba;document['getElementById'](_0x377c12[_0x2684b2(0x226)])[_0x2684b2(0xdf)][_0x2684b2(0xeb)](_0x2684b2(0xca));const _0x119c72={};_0x119c72['behavior']='smooth',document['getElementById'](_0x377c12['Mokjs'])[_0x2684b2(0x24f)](_0x119c72);}function updateSimulator(){const _0x46fd6b=a0_0xbe6288,_0x3b5391={'ZDLRr':function(_0x83791c,_0x41584){return _0x83791c(_0x41584);},'ITxYj':function(_0x13980c,_0x378d89){return _0x13980c===_0x378d89;},'UxBmZ':function(_0x22458b,_0x1db7f7){return _0x22458b<_0x1db7f7;},'hePdh':_0x46fd6b(0x1e1),'xgsht':_0x46fd6b(0x1f4),'gAwvX':_0x46fd6b(0xf9),'rGqxf':_0x46fd6b(0x1ef),'dxsjF':_0x46fd6b(0x1a6),'FpvWE':function(_0x1165c9,_0x5d7c74){return _0x1165c9===_0x5d7c74;},'PVWed':_0x46fd6b(0x19a),'tUDkd':function(_0x2848ed,_0x3fb2ad,_0x211efd,_0x5a6a41){return _0x2848ed(_0x3fb2ad,_0x211efd,_0x5a6a41);},'NMxXq':_0x46fd6b(0x147),'kNWoT':_0x46fd6b(0x173),'pNfpk':function(_0x35fdc1,_0x55df8c){return _0x35fdc1/_0x55df8c;},'MWwlA':function(_0x49e302,_0x1a1e9b){return _0x49e302*_0x1a1e9b;},'LlBdk':function(_0x512529,_0x406354){return _0x512529-_0x406354;},'DLEWk':_0x46fd6b(0x1f7),'PvUbA':'\x20:\x20','gmfRe':'\x20EUR\x20brut/mois)','Yqpgb':'simCoutCDI','fKBMd':'simCoutApprenti','mZaDM':function(_0x5d3594,_0x3e868a){return _0x5d3594(_0x3e868a);},'yvSbC':'simEconomiePct','teJCo':function(_0x82b4e8,_0x4eec7a){return _0x82b4e8+_0x4eec7a;},'NOZyp':_0x46fd6b(0x21a),'dwkaN':function(_0x273461,_0x364051){return _0x273461(_0x364051);},'mQinL':_0x46fd6b(0x210),'jsAff':function(_0x17db6d,_0x298fa8){return _0x17db6d(_0x298fa8);},'FYYaf':'simAide','xClkG':_0x46fd6b(0x12f),'pbzmA':function(_0x3038a6,_0x407134){return _0x3038a6(_0x407134);},'oESRl':'simPresenceInfo','kQctn':'h/an\x20dont\x20','RcKau':_0x46fd6b(0x123),'fdjPv':function(_0x264254,_0x2004cc){return _0x264254+_0x2004cc;},'BYOnr':'<strong>Aide\x20applicable\x20:\x20','DGeYT':'Majoration\x20RQTH\x20:\x206\x20000\x20EUR\x20quel\x20que\x20soit\x20le\x20niveau\x20de\x20formation.','nZDpx':_0x46fd6b(0x231),'itwuF':_0x46fd6b(0x157),'EzZyG':_0x46fd6b(0x1f2)},_0x1cc3c1=_0x3b5391['ZDLRr'](parseInt,document[_0x46fd6b(0x16a)]('simAge')['value']),[_0x2aa5c6,_0x5e4c1e]=document[_0x46fd6b(0x16a)]('simFormation')['value'][_0x46fd6b(0x235)]('-'),_0xd39e3a=_0x3b5391[_0x46fd6b(0x1bc)](parseInt,_0x5e4c1e),_0x531da7=_0x3b5391['ITxYj'](document[_0x46fd6b(0x16a)](_0x46fd6b(0x197))[_0x46fd6b(0x1b6)],'oui'),_0x30f0f1=document['getElementById']('effectif')[_0x46fd6b(0x1b6)];let _0x1a161b,_0x5bf110,_0x5ad44f,_0x3e4b7b;if(_0x3b5391['UxBmZ'](_0x1cc3c1,0x12))_0x1a161b=_0x3b5391['hePdh'],_0x5bf110=0.27,_0x5ad44f=_0x3b5391['xgsht'];else{if(_0x1cc3c1<0x15)_0x1a161b=_0x3b5391[_0x46fd6b(0x185)],_0x5bf110=0.43,_0x5ad44f='young';else _0x1cc3c1<0x1a?(_0x1a161b=_0x3b5391['rGqxf'],_0x5bf110=0.53,_0x5ad44f='mid'):(_0x1a161b=_0x46fd6b(0x1ff),_0x5bf110=0x1,_0x5ad44f=_0x3b5391[_0x46fd6b(0x232)]);}if(_0x3b5391['FpvWE'](_0x2aa5c6,'tp'))_0x3e4b7b=0x4;else{if(_0x3b5391['FpvWE'](_0x2aa5c6,_0x3b5391['PVWed']))_0x3e4b7b=0x5;else _0x3e4b7b=0x6;}const _0x1a10e0=_0x3b5391[_0x46fd6b(0x242)](getAide,_0x3e4b7b,_0x30f0f1,_0x531da7),_0x26270d=_0x3b5391['FpvWE'](_0x30f0f1,_0x3b5391['NMxXq'])||_0x3b5391['ITxYj'](_0x30f0f1,_0x3b5391[_0x46fd6b(0x220)])?0.077:0.016,_0x22d769=_0x2aa5c6===_0x3b5391[_0x46fd6b(0x194)]?0x2a3:_0x2aa5c6==='bachelor'?0x258:0x1c2,_0xfffaec=(H_AN-_0x22d769)*_0x3b5391['pNfpk'](_0xd39e3a,0xc),_0x5bb5b9=SMIC_H*_0xfffaec,_0x10c28a=_0x3b5391['MWwlA'](_0x5bb5b9,0.25),_0x3c0f25=_0x5bb5b9+_0x10c28a,_0x59ffdb=SMIC_M*_0x5bf110,_0x54f871=_0x3b5391[_0x46fd6b(0x246)](_0x59ffdb,_0xd39e3a),_0x2583b3=_0x54f871*_0x26270d,_0x3673e3=_0x54f871+_0x2583b3,_0x36a8f5=_0x3673e3-_0x1a10e0,_0x29368c=_0x3b5391['LlBdk'](_0x3c0f25,_0x36a8f5),_0xc140fe=_0x3c0f25>0x0?_0x3b5391[_0x46fd6b(0x23b)](_0x29368c,_0x3c0f25)*0x64:0x0,_0x2854d6=document['getElementById'](_0x3b5391[_0x46fd6b(0x15c)]);_0x2854d6['textContent']=_0x1a161b+_0x3b5391['PvUbA']+Math['round'](_0x5bf110*0x64)+'%\x20du\x20SMIC\x20('+Math['round'](_0x59ffdb)+_0x3b5391['gmfRe'],_0x2854d6[_0x46fd6b(0x131)]='sim-badge\x20'+_0x5ad44f,document[_0x46fd6b(0x16a)](_0x3b5391['Yqpgb'])['textContent']=fmt(_0x3c0f25),document['getElementById'](_0x3b5391['fKBMd'])['textContent']=fmt(_0x36a8f5),document[_0x46fd6b(0x16a)]('simEconomie')['textContent']=_0x3b5391['mZaDM'](fmt,_0x29368c),document['getElementById'](_0x3b5391[_0x46fd6b(0x200)])['textContent']=_0x3b5391['teJCo'](_0x3b5391['teJCo']('soit\x20',Math[_0x46fd6b(0x168)](_0xc140fe)),'%\x20d\x27economie'),document['getElementById'](_0x3b5391['NOZyp'])['textContent']=_0x3b5391[_0x46fd6b(0x1b3)](fmt,_0x5bb5b9),document[_0x46fd6b(0x16a)](_0x3b5391[_0x46fd6b(0x17d)])['textContent']=fmt(_0x54f871),document['getElementById']('simChargesCDI')['textContent']=_0x3b5391['jsAff'](fmt,_0x10c28a),document['getElementById'](_0x46fd6b(0x18c))[_0x46fd6b(0x23d)]=fmt(_0x2583b3),document[_0x46fd6b(0x16a)](_0x3b5391['FYYaf'])[_0x46fd6b(0x23d)]='-\x20'+fmt(_0x1a10e0),document['getElementById'](_0x3b5391[_0x46fd6b(0x1bd)])['textContent']=_0x3b5391[_0x46fd6b(0x1e0)](fmt,_0x3c0f25),document['getElementById'](_0x46fd6b(0x155))['textContent']=fmt(_0x36a8f5);var _0x5baea5=Math[_0x46fd6b(0x168)](_0x22d769),_0x4c0e1d=Math['round'](_0xfffaec);document['getElementById'](_0x3b5391[_0x46fd6b(0x179)])['textContent']=_0x3b5391['teJCo'](_0x3b5391['teJCo'](_0x3b5391[_0x46fd6b(0x1fa)](_0x46fd6b(0x199)+_0x4c0e1d,'h\x20en\x20entreprise\x20sur\x20')+_0xd39e3a+_0x46fd6b(0xf8),H_AN),_0x3b5391[_0x46fd6b(0x1e2)])+_0x5baea5+_0x3b5391['RcKau'],document['getElementById'](_0x46fd6b(0x16e))[_0x46fd6b(0x23d)]=_0x46fd6b(0x1a8)+_0x4c0e1d+_0x46fd6b(0x223),document[_0x46fd6b(0x16a)]('simHeuresCDI')[_0x46fd6b(0x23d)]=_0x3b5391['teJCo'](_0x4c0e1d,'h'),document['getElementById'](_0x46fd6b(0x12d))[_0x46fd6b(0x23d)]=_0x4c0e1d+'h';const _0x26dc31=_0x30f0f1===_0x46fd6b(0x147);let _0x53dedc=_0x3b5391['fdjPv'](_0x3b5391[_0x46fd6b(0x205)],_0x1a10e0['toLocaleString']('fr-FR'))+_0x46fd6b(0xe2);if(_0x531da7)_0x53dedc+=_0x3b5391['DGeYT'];else{if(!_0x26dc31&&_0x3e4b7b<=0x4)_0x53dedc+=_0x3b5391['nZDpx'];else{if(!_0x26dc31&&_0x3b5391['FpvWE'](_0x3e4b7b,0x5))_0x53dedc+=_0x3b5391[_0x46fd6b(0x1d3)];else{if(!_0x26dc31&&_0x3e4b7b>=0x6)_0x53dedc+=_0x3b5391[_0x46fd6b(0xef)];else _0x53dedc+='Aide\x20exceptionnelle\x20(decret\x202026-168)\x20—\x20entreprise\x20de\x20250\x20salariés\x20et\x20plus.';}}}_0x53dedc+=_0x46fd6b(0x1ae),document['getElementById']('aideInfo')[_0x46fd6b(0x133)]=_0x53dedc;}function fmt(_0x4fb905){const _0x5ed1ec=a0_0xbe6288,_0x3fd8cb={};_0x3fd8cb['mhoPH']=function(_0x5b15d7,_0x2c6e08){return _0x5b15d7+_0x2c6e08;},_0x3fd8cb[_0x5ed1ec(0x105)]=_0x5ed1ec(0x244),_0x3fd8cb['NTpgR']='\x20EUR';const _0x55eaca=_0x3fd8cb;return _0x55eaca[_0x5ed1ec(0x1b7)](Math['round'](_0x4fb905)['toLocaleString'](_0x55eaca['Ctgsu']),_0x55eaca['NTpgR']);}function getFormData(){const _0x4f1606=a0_0xbe6288,_0x20e477={};_0x20e477[_0x4f1606(0x138)]='prenom',_0x20e477['pKZct']='email',_0x20e477[_0x4f1606(0x106)]='telephone';const _0x35eff2=_0x20e477;return{'entreprise':document[_0x4f1606(0x16a)]('entreprise')['value']['trim'](),'nom':document['getElementById'](_0x4f1606(0x10f))['value'][_0x4f1606(0x221)](),'prenom':document[_0x4f1606(0x16a)](_0x35eff2[_0x4f1606(0x138)])['value'][_0x4f1606(0x221)](),'email':document[_0x4f1606(0x16a)](_0x35eff2['pKZct'])[_0x4f1606(0x1b6)][_0x4f1606(0x221)](),'telephone':document['getElementById'](_0x35eff2[_0x4f1606(0x106)])['value'][_0x4f1606(0x221)](),'fonction':document['getElementById']('fonction')[_0x4f1606(0x1b6)]['trim'](),'commentaire':document[_0x4f1606(0x16a)](_0x4f1606(0x183))[_0x4f1606(0x1b6)][_0x4f1606(0x221)]()};}function exportPDF(){const _0x3fbff4=a0_0xbe6288,_0x2a4a3c={'kcWrD':'helvetica','HjGTS':function(_0x130cc1,_0x4992ed){return _0x130cc1+_0x4992ed;},'SRbvL':_0x3fbff4(0x13f),'Vqvpx':function(_0x413e88,_0x49e377){return _0x413e88+_0x49e377;},'AcLbP':'\x20|\x20','YSWUX':_0x3fbff4(0x117),'SKDoF':'fr-FR','ZZCIj':'\x20EUR','VIHxX':function(_0x536ea8){return _0x536ea8();},'oKWcj':'bold','RJVrA':_0x3fbff4(0x1f0),'oxddA':function(_0x180042,_0x5ec878){return _0x180042/_0x5ec878;},'MvqQM':function(_0x1e9da9,_0x31f7f0){return _0x1e9da9+_0x31f7f0;},'GNPfq':_0x3fbff4(0xd8),'Vkioq':function(_0x37c255,_0x5c801f){return _0x37c255+_0x5c801f;},'qijMW':function(_0x4c3a45,_0x5116b2){return _0x4c3a45+_0x5116b2;},'TEhuF':_0x3fbff4(0x100),'fVSlq':_0x3fbff4(0x1f5),'hAelx':function(_0x451994,_0x5b16b8){return _0x451994+_0x5b16b8;},'KInAe':function(_0x41eba5,_0x1099d9){return _0x41eba5+_0x1099d9;},'TXUzG':'Email\x20:\x20','BGdMA':_0x3fbff4(0x182),'aPwNo':'simEconomie','PONnZ':'simEconomiePct','SgwMD':'CADP\x20—\x20Campus\x20Alternance\x20Drôme\x20Provence\x20—\x202\x20bd\x20Frederic\x20Mistral,\x2026700\x20Pierrelatte\x20—\x20(c)\x202026','xYYQu':function(_0x24aff8,_0x322d6b){return _0x24aff8/_0x322d6b;},'riIwp':_0x3fbff4(0x16c),'GmjDk':'Recommandation_CADP.pdf'},_0x63e86a=_0x2a4a3c['VIHxX'](getFormData),{jsPDF:_0x2b2873}=window[_0x3fbff4(0x190)],_0x4c2529=new _0x2b2873();let _0x1afedf=0x14;const _0x4c6c28=_0x4c2529[_0x3fbff4(0x102)][_0x3fbff4(0xfc)]['width'],_0x50de70=0x14;_0x4c2529[_0x3fbff4(0x1ac)](0xe),_0x4c2529[_0x3fbff4(0x176)](0x14,0x1e,0x3c),_0x4c2529[_0x3fbff4(0x247)](_0x2a4a3c['kcWrD'],_0x2a4a3c['oKWcj']);const _0x456faf={};_0x456faf['align']='center',_0x4c2529[_0x3fbff4(0x1a4)](_0x2a4a3c['RJVrA'],_0x2a4a3c['oxddA'](_0x4c6c28,0x2),_0x1afedf,_0x456faf),_0x1afedf+=0xc;if(_0x63e86a['entreprise']){_0x4c2529[_0x3fbff4(0x1ac)](0x9),_0x4c2529[_0x3fbff4(0x247)](_0x2a4a3c[_0x3fbff4(0x1d5)],_0x3fbff4(0x13f)),_0x4c2529['setTextColor'](0x32,0x32,0x32),_0x4c2529['text'](_0x2a4a3c['MvqQM'](_0x2a4a3c[_0x3fbff4(0x1d1)],_0x63e86a['entreprise']),_0x50de70,_0x1afedf),_0x1afedf+=0x5;if(_0x63e86a[_0x3fbff4(0x10f)])_0x4c2529[_0x3fbff4(0x1a4)](_0x2a4a3c[_0x3fbff4(0xe8)](_0x2a4a3c[_0x3fbff4(0x237)](_0x2a4a3c['TEhuF'],_0x63e86a['prenom'])+'\x20'+_0x63e86a['nom'],_0x63e86a[_0x3fbff4(0xd0)]?_0x2a4a3c['fVSlq']+_0x63e86a['fonction']:''),_0x50de70,_0x1afedf);_0x1afedf+=0x5;if(_0x63e86a['email'])_0x4c2529['text'](_0x2a4a3c['hAelx'](_0x2a4a3c[_0x3fbff4(0x189)](_0x2a4a3c[_0x3fbff4(0x238)],_0x63e86a[_0x3fbff4(0x15b)]),_0x63e86a[_0x3fbff4(0x17e)]?_0x2a4a3c['Vkioq'](_0x3fbff4(0x141),_0x63e86a['telephone']):''),_0x50de70,_0x1afedf);_0x1afedf+=0xa;}_0x4c2529['setFontSize'](0xb),_0x4c2529[_0x3fbff4(0x247)](_0x3fbff4(0x116),_0x2a4a3c[_0x3fbff4(0x145)]),_0x4c2529[_0x3fbff4(0x176)](0x14,0x1e,0x3c),_0x4c2529['text']('Formations\x20recommandees',_0x50de70,_0x1afedf),_0x1afedf+=0x8;const _0xcc3669=document['getElementById'](_0x3fbff4(0x198))['value'],_0x363b7b=Object['entries'](formations)[_0x3fbff4(0x1ad)]((_0x391481,_0x889ba5)=>_0x889ba5[0x1]['p']-_0x391481[0x1]['p'])['filter'](_0x87bc63=>_0x87bc63[0x1]['p']>0x0)[_0x3fbff4(0x15e)](0x0,0x3);_0x4c2529['setFontSize'](0x9),_0x363b7b['forEach']((_0x481de1,_0x13dc0c)=>{const _0x3ba7aa=_0x3fbff4,_0x3e30f0=_0x481de1[0x1],_0x218990=getAide(_0x3e30f0['nc'],_0xcc3669,![]);_0x4c2529['setFont'](_0x2a4a3c[_0x3ba7aa(0x1d5)],_0x3ba7aa(0x160)),_0x4c2529['setTextColor'](_0x13dc0c===0x0?[0x1b,0x6b,0x3a]:[0x64,0x64,0x64]),_0x4c2529['text'](_0x2a4a3c['HjGTS'](_0x2a4a3c[_0x3ba7aa(0x195)](_0x13dc0c+0x1,'.\x20'),_0x3e30f0[_0x3ba7aa(0x154)])+'\x20—\x20'+_0x3e30f0[_0x3ba7aa(0x1c3)],_0x50de70,_0x1afedf),_0x1afedf+=0x5,_0x4c2529['setFont'](_0x3ba7aa(0x116),_0x2a4a3c[_0x3ba7aa(0x201)]),_0x4c2529[_0x3ba7aa(0x176)](0x64,0x64,0x64),_0x4c2529['text'](_0x2a4a3c[_0x3ba7aa(0x195)](_0x2a4a3c[_0x3ba7aa(0x195)](_0x2a4a3c['Vqvpx'](_0x3ba7aa(0x219),_0x3e30f0[_0x3ba7aa(0x1e7)]),_0x2a4a3c[_0x3ba7aa(0x23a)])+_0x3e30f0[_0x3ba7aa(0x196)]+_0x2a4a3c['YSWUX'],_0x218990[_0x3ba7aa(0xf6)](_0x2a4a3c['SKDoF']))+_0x2a4a3c['ZZCIj'],_0x50de70,_0x1afedf),_0x1afedf+=0x7;}),_0x1afedf+=0x3,_0x4c2529['setFontSize'](0xb),_0x4c2529['setFont'](_0x3fbff4(0x116),'bold'),_0x4c2529[_0x3fbff4(0x176)](0x14,0x1e,0x3c),_0x4c2529[_0x3fbff4(0x1a4)]('Simulation\x20de\x20cout',_0x50de70,_0x1afedf),_0x1afedf+=0x7,_0x4c2529[_0x3fbff4(0x1ac)](0x9),_0x4c2529[_0x3fbff4(0x247)]('helvetica','normal'),_0x4c2529['text']('Cout\x20CDI\x20equivalent\x20:\x20'+document['getElementById']('simCoutCDI')['textContent'],_0x50de70,_0x1afedf),_0x1afedf+=0x5,_0x4c2529[_0x3fbff4(0x1a4)](_0x2a4a3c['BGdMA']+document[_0x3fbff4(0x16a)]('simCoutApprenti')['textContent'],_0x50de70,_0x1afedf),_0x1afedf+=0x5,_0x4c2529[_0x3fbff4(0x247)](_0x3fbff4(0x116),'bold'),_0x4c2529[_0x3fbff4(0x176)](0x1b,0x6b,0x3a),_0x4c2529[_0x3fbff4(0x1a4)](_0x2a4a3c[_0x3fbff4(0xe8)](_0x2a4a3c[_0x3fbff4(0xe1)](_0x2a4a3c['Vqvpx'](_0x2a4a3c['HjGTS'](_0x3fbff4(0x10b),document[_0x3fbff4(0x16a)](_0x2a4a3c[_0x3fbff4(0x113)])['textContent']),'\x20('),document[_0x3fbff4(0x16a)](_0x2a4a3c[_0x3fbff4(0x149)])['textContent']),')'),_0x50de70,_0x1afedf),_0x4c2529[_0x3fbff4(0x1ac)](0x7),_0x4c2529['setTextColor'](0x96,0x96,0x96);const _0x4d5082={};_0x4d5082['align']=_0x3fbff4(0x20f),_0x4c2529['text'](_0x2a4a3c['SgwMD'],_0x2a4a3c['xYYQu'](_0x4c6c28,0x2),_0x4c2529['internal'][_0x3fbff4(0xfc)][_0x3fbff4(0x1b8)]-0xa,_0x4d5082);const _0x3f3cbf=_0x63e86a['entreprise']?_0x2a4a3c[_0x3fbff4(0x189)]('Recommandation_',_0x63e86a[_0x3fbff4(0x174)])+_0x2a4a3c['riIwp']:_0x2a4a3c[_0x3fbff4(0x132)];_0x4c2529[_0x3fbff4(0x13c)](_0x3f3cbf);}const SCRIPT_URL='https://script.google.com/macros/s/AKfycbx_2OXPJpqF30VUr8nBdy3k-oiAgcLX1YbDxMOD8VbZ4iKFTtzsAGKEs1K7actvRktKrw/exec';window[a0_0xbe6288(0xfb)][a0_0xbe6288(0x114)]['indexOf'](a0_0xbe6288(0x10c))!==-0x1&&(document['querySelector']('.container')['innerHTML']='<div\x20style=\x22padding:48px;max-width:600px;margin:0\x20auto;\x22>'+a0_0xbe6288(0x23e)+'<h1\x20style=\x22font-family:DM\x20Serif\x20Display,serif;color:#141E3C;font-size:1.6em;margin-bottom:8px;\x22>Configuration\x20du\x20questionnaire</h1>'+'<p\x20style=\x22color:#8A8680;font-size:0.9em;\x22>Cette\x20page\x20n\x27est\x20visible\x20que\x20par\x20vous\x20(via\x20?config\x20dans\x20l\x27URL).</p>'+'</div>'+'<div\x20style=\x22background:#F8F3E6;border:2px\x20solid\x20#C9A84C;border-radius:10px;padding:24px;margin-bottom:24px;\x22>'+'<h3\x20style=\x22color:#141E3C;margin-bottom:12px;font-size:1em;\x22>Etape\x201\x20—\x20Collez\x20votre\x20URL\x20Google\x20Apps\x20Script</h3>'+'<p\x20style=\x22color:#4A4744;font-size:0.85em;margin-bottom:12px;\x22>C\x27est\x20l\x27URL\x20que\x20Google\x20vous\x20a\x20donnee\x20quand\x20vous\x20avez\x20deploye\x20le\x20script\x20(elle\x20commence\x20par\x20https://script.google.com/macros/...)</p>'+'<input\x20id=\x22configUrl\x22\x20type=\x22text\x22\x20placeholder=\x22https://script.google.com/macros/s/AKfycb.../exec\x22\x20style=\x22width:100%;padding:12px;border:2px\x20solid\x20#E8E6E3;border-radius:8px;font-size:0.9em;font-family:inherit;margin-bottom:8px;\x22>'+'<p\x20id=\x22configStatus\x22\x20style=\x22font-size:0.8em;color:#8A8680;\x22></p>'+'</div>'+a0_0xbe6288(0x172)+a0_0xbe6288(0x211)+'<p\x20style=\x22color:#4A4744;font-size:0.85em;margin-bottom:16px;\x22>Cliquez\x20sur\x20le\x20bouton\x20ci-dessous.\x20Vous\x20obtiendrez\x20un\x20fichier\x20index.html\x20pret\x20a\x20deployer\x20sur\x20GitHub\x20Pages,\x20avec\x20votre\x20URL\x20integree.</p>'+'<button\x20id=\x22configBtn\x22\x20onclick=\x22generateConfiguredFile()\x22\x20style=\x22background:#1B6B3A;color:white;border:none;padding:14px\x2028px;border-radius:8px;font-size:0.95em;font-weight:600;cursor:pointer;font-family:inherit;width:100%;\x22>Generer\x20mon\x20fichier\x20index.html</button>'+a0_0xbe6288(0x12a)+'<div\x20style=\x22background:#F4F3F1;border-radius:10px;padding:24px;\x22>'+a0_0xbe6288(0x11a)+a0_0xbe6288(0x1e6)+a0_0xbe6288(0x12a)+a0_0xbe6288(0x137)+'<a\x20href=\x22?\x22\x20style=\x22color:#C9A84C;font-size:0.85em;\x22>Voir\x20le\x20questionnaire\x20tel\x20que\x20les\x20entreprises\x20le\x20voient</a>'+a0_0xbe6288(0x12a)+a0_0xbe6288(0x12a));function generateConfiguredFile(){const _0x5f423f=a0_0xbe6288,_0x3f084c={};_0x3f084c['tkGKo']=_0x5f423f(0x1bf),_0x3f084c[_0x5f423f(0x14d)]='https://script.google.com/',_0x3f084c[_0x5f423f(0x1b2)]=_0x5f423f(0x143),_0x3f084c['XYncf']=_0x5f423f(0x1ee),_0x3f084c[_0x5f423f(0x14a)]='URL\x20valide.',_0x3f084c[_0x5f423f(0x19e)]=_0x5f423f(0x1c1),_0x3f084c[_0x5f423f(0x11d)]=_0x5f423f(0xff),_0x3f084c['lmDCI']=_0x5f423f(0x215),_0x3f084c['NukYy']='#C9A84C';const _0xf0db58=_0x3f084c;var _0x2d54a2=document['getElementById'](_0xf0db58[_0x5f423f(0x188)])['value'][_0x5f423f(0x221)]();if(!_0x2d54a2||!_0x2d54a2['startsWith'](_0xf0db58[_0x5f423f(0x14d)])){document['getElementById'](_0x5f423f(0x143))[_0x5f423f(0x23d)]=_0x5f423f(0x20d),document[_0x5f423f(0x16a)](_0xf0db58[_0x5f423f(0x1b2)])['style'][_0x5f423f(0x1f1)]=_0xf0db58['XYncf'];return;}document['getElementById'](_0x5f423f(0x143))['textContent']=_0xf0db58[_0x5f423f(0x14a)],document[_0x5f423f(0x16a)](_0xf0db58[_0x5f423f(0x1b2)])[_0x5f423f(0x22d)][_0x5f423f(0x1f1)]=_0xf0db58['HJCQw'];var _0x13106f=_0x5f423f(0x161)+document['documentElement']['outerHTML'];_0x13106f=_0x13106f['replace'](_0x5f423f(0xe5),_0xf0db58['LAPvE']+_0x2d54a2+'\x27');const _0x34186d={};_0x34186d['type']=_0x5f423f(0xd1);var _0x3e9d31=new Blob([_0x13106f],_0x34186d),_0x159e60=document[_0x5f423f(0x136)]('a');_0x159e60[_0x5f423f(0x101)]=URL[_0x5f423f(0x18e)](_0x3e9d31),_0x159e60[_0x5f423f(0x243)]=_0x5f423f(0x1a7),_0x159e60[_0x5f423f(0x248)](),document[_0x5f423f(0x16a)](_0x5f423f(0x215))['textContent']='Fichier\x20telecharge\x20!',document['getElementById'](_0xf0db58['lmDCI'])['style']['background']=_0xf0db58[_0x5f423f(0x139)];}function sendEmail(){const _0x25eeeb=a0_0xbe6288,_0xe5b651={'gumtQ':function(_0x33eb8e,_0x452ed7){return _0x33eb8e+_0x452ed7;},'TevOU':function(_0x1c0244,_0x18ef65){return _0x1c0244+_0x18ef65;},'Jmqnj':'<div\x20style=\x22width:60px;height:60px;border-radius:50%;background:#E8F5E9;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;\x22><svg\x20width=\x2228\x22\x20height=\x2228\x22\x20fill=\x22none\x22\x20stroke=\x22#1B6B3A\x22\x20stroke-width=\x222.5\x22\x20viewBox=\x220\x200\x2024\x2024\x22><path\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22\x20d=\x22M5\x2013l4\x204L19\x207\x22/></svg></div>','YFYXy':_0x25eeeb(0x230),'gGagZ':'</strong>.</p>','TcfZm':'<p\x20style=\x22color:#4A4744;margin-bottom:20px;\x22>Un\x20conseiller\x20CADP\x20vous\x20recontactera\x20dans\x20les\x20meilleurs\x20delais.</p>','rLARK':_0x25eeeb(0xea),'XIbuf':'</div>','YdoPa':_0x25eeeb(0x107),'pjGXA':function(_0x591d0b,_0x22fec0,_0x4c0031){return _0x591d0b(_0x22fec0,_0x4c0031);},'xKRtn':function(_0x376a0e,_0x2e0951){return _0x376a0e(_0x2e0951);},'VzYSY':_0x25eeeb(0x1be),'SdsLd':function(_0x30aeed,_0x6244f){return _0x30aeed===_0x6244f;},'OPcDI':_0x25eeeb(0x11f),'KqNcC':_0x25eeeb(0x1ed),'KtkOQ':_0x25eeeb(0x1aa),'NczPC':_0x25eeeb(0x150),'qFiFo':_0x25eeeb(0x119),'GwvJz':_0x25eeeb(0x245),'mSFxb':function(_0x48b743,_0x2a921b){return _0x48b743===_0x2a921b;},'GxXiS':'2j\x20campus\x20/\x203j\x20entreprise','vXjIU':function(_0x57106d,_0x10d0fa){return _0x57106d===_0x10d0fa;},'cFMaT':_0x25eeeb(0x21e),'qGYeu':function(_0x1ed1c8,_0x534ae1){return _0x1ed1c8+_0x534ae1;},'VJlcy':_0x25eeeb(0x1f5),'aWVGq':function(_0x4230b2,_0x353054){return _0x4230b2+_0x353054;},'nDhcU':_0x25eeeb(0x1c4),'HHPDv':'experienceDetail','rOpTJ':'https://script.google.com/macros/s/AKfycbx_2OXPJpqF30VUr8nBdy3k-oiAgcLX1YbDxMOD8VbZ4iKFTtzsAGKEs1K7actvRktKrw/exec','IffPN':'Demande\x20alternance\x20—\x20','vLqQN':function(_0x560e96,_0x4bedec){return _0x560e96+_0x4bedec;},'uKIFS':function(_0x4cb49c,_0x2e0342){return _0x4cb49c+_0x2e0342;},'Ekcjh':function(_0x3dd666,_0x1338c5){return _0x3dd666+_0x1338c5;},'NTtSK':function(_0x1accdf,_0x13427d){return _0x1accdf+_0x13427d;},'DdoLD':function(_0x26bbc1,_0x2ad304){return _0x26bbc1+_0x2ad304;},'iYHVf':function(_0x3c1674,_0x4b111b){return _0x3c1674+_0x4b111b;},'VZFfi':function(_0x40de82,_0x16a181){return _0x40de82+_0x16a181;},'nZhll':function(_0x4d67d2,_0x4065b8){return _0x4d67d2+_0x4065b8;},'zPScU':function(_0x2ee051,_0x2ee1f4){return _0x2ee051+_0x2ee1f4;},'rXsCi':function(_0xbccd93,_0x112fab){return _0xbccd93+_0x112fab;},'eIKcA':function(_0x144b14,_0x1174ea){return _0x144b14+_0x1174ea;},'rPxJb':function(_0x5da53e,_0x4c77ac){return _0x5da53e+_0x4c77ac;},'KbRSl':_0x25eeeb(0x15d),'ujOKz':_0x25eeeb(0x11b),'HTVqY':_0x25eeeb(0x1a3),'jGwZe':'\x0aEFFECTIF\x20:\x20','WCvwx':_0x25eeeb(0x212),'vWkVl':'\x0aRYTHME\x20:\x20','epXRF':function(_0x179d14,_0x115876){return _0x179d14+_0x115876;},'xrVyJ':'\x0a\x0aCordialement,\x0a','pPeFQ':function(_0x2093e4,_0x34be48){return _0x2093e4(_0x34be48);},'SENbj':_0x25eeeb(0x1c9),'YkeLD':_0x25eeeb(0x222),'fPsas':_0x25eeeb(0xdc)},_0x3ba5eb=getFormData();if(!_0x3ba5eb[_0x25eeeb(0x174)]||!_0x3ba5eb['nom']||!_0x3ba5eb['email']||!_0x3ba5eb['telephone']){_0xe5b651['xKRtn'](alert,'Merci\x20de\x20remplir\x20au\x20minimum\x20:\x20entreprise,\x20nom,\x20email\x20et\x20telephone.');return;}const _0x4c7fee=document[_0x25eeeb(0x16a)](_0x25eeeb(0x198))['value'],_0x56562e=document['getElementById'](_0xe5b651['VzYSY'])['value'],_0x127768=Object[_0x25eeeb(0x130)](formations)[_0x25eeeb(0x1ad)]((_0x367558,_0x26cf8a)=>_0x26cf8a[0x1]['p']-_0x367558[0x1]['p'])['filter'](_0x4a5551=>_0x4a5551[0x1]['p']>0x0)['slice'](0x0,0x3),_0x5ab118=document['querySelector']('input[name=\x22secteur\x22]:checked'),_0x6bdb3c=document['querySelector'](_0x25eeeb(0x13b)),_0x4d9056=document['querySelector'](_0x25eeeb(0x22a)),_0x518392={'entreprise':_0x3ba5eb['entreprise'],'nom':_0x3ba5eb[_0x25eeeb(0x10f)],'prenom':_0x3ba5eb['prenom'],'fonction':_0x3ba5eb['fonction'],'email':_0x3ba5eb['email'],'telephone':_0x3ba5eb['telephone'],'effectif':_0x4c7fee,'dejaAlternant':_0xe5b651[_0x25eeeb(0xd9)](_0x56562e,_0x25eeeb(0x1db))?_0xe5b651[_0x25eeeb(0x144)]:_0xe5b651['SdsLd'](_0x56562e,'oui-autre')?_0xe5b651[_0x25eeeb(0x1f9)]:_0xe5b651['KtkOQ'],'secteur':_0x5ab118?_0x5ab118[_0x25eeeb(0x1b6)]:'','quand':_0x6bdb3c?_0x6bdb3c['value']==='sept2026'?_0xe5b651[_0x25eeeb(0x209)]:_0x6bdb3c[_0x25eeeb(0x1b6)]===_0x25eeeb(0xd4)?_0xe5b651[_0x25eeeb(0x186)]:_0xe5b651[_0x25eeeb(0x1b9)]:'','rythme':_0x4d9056?_0xe5b651[_0x25eeeb(0x1ca)](_0x4d9056['value'],_0x25eeeb(0x17b))?_0xe5b651['GxXiS']:_0xe5b651[_0x25eeeb(0x163)](_0x4d9056['value'],_0x25eeeb(0x191))?_0xe5b651['cFMaT']:'Indifferent':'','formation1':_0x127768[0x0]?_0xe5b651[_0x25eeeb(0x236)](_0x127768[0x0][0x1][_0x25eeeb(0x154)],'\x20—\x20')+_0x127768[0x0][0x1]['full']:'','formation2':_0x127768[0x1]?_0x127768[0x1][0x1]['name']+_0xe5b651[_0x25eeeb(0x109)]+_0x127768[0x1][0x1][_0x25eeeb(0x1c3)]:'','formation3':_0x127768[0x2]?_0xe5b651[_0x25eeeb(0xdd)](_0xe5b651[_0x25eeeb(0xed)](_0x127768[0x2][0x1][_0x25eeeb(0x154)],'\x20—\x20'),_0x127768[0x2][0x1][_0x25eeeb(0x1c3)]):'','economie':document[_0x25eeeb(0x16a)](_0x25eeeb(0x203))['textContent'],'aide':document[_0x25eeeb(0x16a)]('simAide')[_0x25eeeb(0x23d)]['replace']('-\x20',''),'commentaire':_0x3ba5eb['commentaire'],'experienceNote':document[_0x25eeeb(0x16a)](_0xe5b651['nDhcU'])?.[_0x25eeeb(0x1b6)]||'','experienceDetail':document['getElementById'](_0xe5b651['HHPDv'])?.[_0x25eeeb(0x1b6)]||''};var _0x3b30d0=document['querySelector']('#contactSection\x20.btn-success'),_0x202ad0=_0x3b30d0[_0x25eeeb(0x23d)];if(SCRIPT_URL===_0xe5b651[_0x25eeeb(0x21c)]){var _0x1b4dee=_0xe5b651['IffPN']+_0x3ba5eb['entreprise'],_0x57ec66=_0xe5b651[_0x25eeeb(0xdd)](_0xe5b651['vLqQN'](_0xe5b651[_0x25eeeb(0x165)](_0xe5b651[_0x25eeeb(0x1c2)](_0xe5b651['Ekcjh'](_0xe5b651[_0x25eeeb(0xdd)](_0xe5b651['NTtSK'](_0xe5b651[_0x25eeeb(0x165)](_0xe5b651['DdoLD'](_0xe5b651['iYHVf'](_0xe5b651[_0x25eeeb(0x165)](_0xe5b651['gumtQ'](_0xe5b651['VZFfi'](_0xe5b651['nZhll'](_0xe5b651['zPScU'](_0xe5b651['nZhll'](_0xe5b651[_0x25eeeb(0x19f)](_0xe5b651['eIKcA'](_0xe5b651[_0x25eeeb(0x1e4)]('ENTREPRISE\x20:\x20'+_0x3ba5eb[_0x25eeeb(0x174)],_0xe5b651['KbRSl'])+_0x3ba5eb[_0x25eeeb(0x206)],'\x20'),_0x3ba5eb[_0x25eeeb(0x10f)])+_0xe5b651['ujOKz'],_0x3ba5eb['fonction']||'-'),_0xe5b651[_0x25eeeb(0x20a)]),_0x3ba5eb['email'])+_0x25eeeb(0x1c0)+_0x3ba5eb['telephone']+_0xe5b651[_0x25eeeb(0x164)]+_0x4c7fee+_0xe5b651[_0x25eeeb(0x204)],_0x518392['quand']||'-')+_0xe5b651[_0x25eeeb(0x227)],_0x518392[_0x25eeeb(0x11c)]||'-'),'\x0a\x0aFORMATIONS\x20:\x0a1.\x20'),_0x518392[_0x25eeeb(0x17a)]),'\x0a2.\x20'),_0x518392[_0x25eeeb(0xcd)])+(_0x518392[_0x25eeeb(0x21b)]?'\x0a3.\x20'+_0x518392[_0x25eeeb(0x21b)]:''),'\x0a\x0aECONOMIE\x20:\x20'),_0x518392['economie'])+_0x25eeeb(0xe6),_0x518392[_0x25eeeb(0x23c)]),_0x3ba5eb[_0x25eeeb(0x183)]?_0xe5b651[_0x25eeeb(0x128)]('\x0a\x0aCOMMENTAIRE\x20:\x20',_0x3ba5eb['commentaire']):'')+_0xe5b651['xrVyJ'],_0x3ba5eb[_0x25eeeb(0x206)]),'\x20'),_0x3ba5eb['nom']);window['location']['href']='mailto:contact@cadp.pro?subject='+_0xe5b651[_0x25eeeb(0x20e)](encodeURIComponent,_0x1b4dee)+_0xe5b651['SENbj']+_0xe5b651[_0x25eeeb(0x20e)](encodeURIComponent,_0x57ec66);return;}_0x3b30d0[_0x25eeeb(0x23d)]='Envoi\x20en\x20cours...',_0x3b30d0['disabled']=!![];const _0x5287fb={};_0x5287fb[_0x25eeeb(0x18b)]='application/json',fetch(SCRIPT_URL,{'method':_0xe5b651['YkeLD'],'mode':_0xe5b651['fPsas'],'headers':_0x5287fb,'body':JSON['stringify'](_0x518392)})[_0x25eeeb(0x241)](function(){const _0x2eb3ad=_0x25eeeb;document['getElementById'](_0x2eb3ad(0x1b0))[_0x2eb3ad(0x133)]=_0xe5b651[_0x2eb3ad(0xdd)](_0xe5b651[_0x2eb3ad(0xdd)](_0xe5b651[_0x2eb3ad(0xdd)](_0xe5b651[_0x2eb3ad(0xdd)](_0xe5b651[_0x2eb3ad(0x1f3)]('<div\x20style=\x22text-align:center;padding:40px\x2020px;\x22>'+_0xe5b651[_0x2eb3ad(0x1cb)],'<h2\x20style=\x22font-family:DM\x20Serif\x20Display,serif;color:#141E3C;margin-bottom:12px;\x22>Demande\x20bien\x20recue\x20!</h2>')+_0xe5b651[_0x2eb3ad(0x1af)],_0x518392[_0x2eb3ad(0x206)])+_0x2eb3ad(0x22c),_0x518392['entreprise']),_0xe5b651['gGagZ']),_0xe5b651[_0x2eb3ad(0x1d7)])+_0xe5b651[_0x2eb3ad(0x1cf)]+_0xe5b651['XIbuf'];})[_0x25eeeb(0x187)](function(){const _0x10193a=_0x25eeeb;_0x3b30d0['textContent']=_0xe5b651['YdoPa'],_0x3b30d0['disabled']=![],_0xe5b651[_0x10193a(0x10d)](setTimeout,function(){const _0x81eca9=_0x10193a;_0x3b30d0[_0x81eca9(0x23d)]=_0x202ad0,_0x3b30d0[_0x81eca9(0x193)]=![];},0xbb8);});}function restartQuiz(){const _0x1d6b9c=a0_0xbe6288,_0x409dd9={'xgcTP':_0x1d6b9c(0x233),'WoCJE':_0x1d6b9c(0x22f),'RsXXO':'contactSection','MEuuk':'active','AyTTv':_0x1d6b9c(0x167),'MgQeE':function(_0x343a39){return _0x343a39();}};Object[_0x1d6b9c(0xf0)](formations)[_0x1d6b9c(0x20b)](_0x3371e6=>formations[_0x3371e6]['p']=0x0),document[_0x1d6b9c(0x18d)](_0x409dd9['WoCJE'])[_0x1d6b9c(0x20b)](_0xc74503=>{const _0x7c96ce=_0x1d6b9c;_0xc74503['checked']=![];const _0x30fe2c=_0xc74503['closest'](_0x7c96ce(0x239))||_0xc74503['closest'](_0x7c96ce(0x1ab));if(_0x30fe2c)_0x30fe2c['classList'][_0x7c96ce(0x1a1)](_0x409dd9['xgcTP']);}),document['querySelectorAll'](_0x1d6b9c(0x1fc))[_0x1d6b9c(0x20b)](_0x400ec3=>_0x400ec3[_0x1d6b9c(0x1b6)]=''),document['getElementById']('results')[_0x1d6b9c(0xdf)]['remove'](_0x1d6b9c(0xca)),document['getElementById'](_0x409dd9[_0x1d6b9c(0x1f8)])['classList'][_0x1d6b9c(0x1a1)](_0x409dd9[_0x1d6b9c(0x10a)]),document[_0x1d6b9c(0x16a)](_0x409dd9[_0x1d6b9c(0x110)])['classList']['add'](_0x1d6b9c(0xca)),currentSection=0x1,_0x409dd9['MgQeE'](updateUI),window['scrollTo'](0x0,0x0);}updateUI();</script>
 </body>
 </html>
